@@ -39,5 +39,11 @@ jobs:
       - name: Build site
         run: mkdocs build --strict
 
+      - name: Override index with landing page
+        run: cp landing.html site/index.html
+
       - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

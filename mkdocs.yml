@@ -98,7 +98,7 @@ extra:
       link: https://github.com/UPeU-Infra/ariel
 
 nav:
-  - Inicio: overview.md
+  - Inicio: index.md
   - Propuesta Ejecutiva: propuesta-ejecutiva.md
   - Arquitectura: arquitectura.md
   - Financiamiento: financiamiento.md
