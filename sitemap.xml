@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://upeu-infra.github.io/guia/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/arquitectura/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/arquitectura/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/arquitectura/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/conectores/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/conectores/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/conectores/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/estandares/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/estandares/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/estandares/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/modelo-comercial/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/modelo-comercial/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/modelo-comercial/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/roadmap/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/roadmap/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/roadmap/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/en/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/en/arquitectura/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/arquitectura/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/arquitectura/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/en/conectores/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/conectores/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/conectores/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/en/estandares/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/estandares/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/estandares/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/en/modelo-comercial/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/modelo-comercial/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/modelo-comercial/"/>
+    </url>
+    <url>
+        <loc>https://upeu-infra.github.io/guia/en/roadmap/</loc>
+        <lastmod>2026-04-05</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://upeu-infra.github.io/guia/en/roadmap/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://upeu-infra.github.io/guia/roadmap/"/>
+    </url>
+</urlset>
