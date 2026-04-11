@@ -88,27 +88,36 @@ Federador que agrega nodos GUIA de multiples universidades.
 | Soporte + SLA | Respuesta <4h, uptime garantizado, actualizaciones | Produccion necesita respaldo |
 | Hub federado | SaaS central que agrega nodos | Valor de red — un Hub es mas util que N nodos aislados |
 
-### Tiers de pricing
+### Tres planes comerciales
 
-| Tier | Incluye | Precio | Revenue real |
-|------|---------|--------|-------------|
-| **Community** | Core open source (DSpace + OJS + RAG + chat web + Telegram) | Gratis (Apache 2.0) | Pipeline de clientes |
-| **Managed Basic** | SciBack hospeda Node + DSpace + OJS + soporte email | ~$150-300/mes | Hosting + mantenimiento |
-| **Managed Pro** | + Koha + SIS/ERP + Keycloak SSO + midPoint | ~$400-700/mes | Implementacion custom + conectores |
-| **Managed Enterprise** | + WhatsApp + SLA 99.9% + analytics + soporte dedicado | ~$800-1500/mes | SLA + operaciones |
-| **Implementacion** | Proyecto de integracion inicial (one-time) | ~$2K-5K | Consultoria + config por universidad |
-| **Hub** | Federacion de nodos (SaaS) | ~$500-5000/mes | Valor de red |
+| Plan | Incluye | Precio mensual | Precio anual |
+|------|---------|---------------|-------------|
+| **GUIA Research** (Community) | Core open source: DSpace + OJS + RAG + chat web + Telegram | Gratis (Apache 2.0) | Pipeline de clientes |
+| **GUIA Research** (Managed) | SciBack hospeda + DSpace + OJS + soporte email | ~$150-300/mes | $1.8K-3.6K |
+| **GUIA Campus** | Research + Koha + SIS + ERP + Moodle + Keycloak SSO | ~$400-700/mes | $4.8K-8.4K |
+| **GUIA Connect** | Campus + Helpdesk + Calendarios + Teams + CRM + MCP Server | ~$800-1500/mes | $9.6K-18K |
+| **Implementacion** | Proyecto de integracion inicial (one-time) | — | $1K-6K |
+| **Hub** | Federacion de nodos (SaaS, add-on) | ~$200-500/mes | $2.4K-6K |
 
 ### Barrera de pago (que NO esta en Community)
 1. **Conectores Campus** — Koha, SIS, ERP, Moodle (codigo privado en guia-campus)
-2. **Identidad compleja** — midPoint + Keycloak con AD/Entra/LDAP de cada universidad
-3. **Operaciones** — hosting, backups, SSL, monitoring, actualizaciones 24/7
-4. **WhatsApp** — requiere Cloud API Meta, config por universidad
-5. **Hub** — federacion, OAI-PMH server, MCP server
+2. **Conectores Connect** — Helpdesk (Zammad/GLPI), Calendarios, Teams, CRM, BD custom, Webhooks
+3. **MCP Server** — expone GUIA como herramienta para Claude, GPT, Copilot
+4. **Identidad compleja** — midPoint + Keycloak con AD/Entra/LDAP de cada universidad
+5. **Operaciones** — hosting, backups, SSL, monitoring, actualizaciones 24/7
+6. **Hub** — federacion, OAI-PMH server, valor de red
 
-**Posicionamiento:** Alternativa open-source a EBSCO EDS / Ex Libris Primo / Summon.
-- EDS: $20K-50K/ano. GUIA Managed Pro: ~$5K-8K/ano.
-- Chat conversacional + WhatsApp en vez de formularios de busqueda.
+### Competencia y posicionamiento
+
+**Competidor principal identificado: OpenAlex + Perplexity**
+- OpenAlex + Perplexity ya resuelven la busqueda academica publica de forma gratuita
+- GUIA no compite en contenido publico — compite en el **estrato institucional privado**
+- El moat de GUIA: tesis no indexadas, datos de campus, cumplimiento ALICIA/RENATI, y ACCION (no solo consulta)
+
+**Posicionamiento por plan:**
+- GUIA Research: "La capa que Perplexity no puede ver — tu produccion institucional privada" ($1.8K-3.6K/ano vs $20K-50K de EDS)
+- GUIA Campus: "El asistente que conoce toda tu vida universitaria" (sin competidor directo en LATAM)
+- GUIA Connect: "El sistema operativo AI de tu universidad — cualquier sistema, cualquier canal, cualquier AI externa"
 
 ---
 
@@ -117,8 +126,9 @@ Federador que agrega nodos GUIA de multiples universidades.
 ### Completado
 - Nombre oficial definido: GUIA
 - Arquitectura tecnica definida (Node + Hub, dos capas)
-- Modelo comercial open-core definido
-- Sitio web (pendiente actualizar con nueva identidad)
+- Modelo comercial open-core definido con 3 planes (Research, Campus, Connect)
+- Competidor principal identificado: OpenAlex + Perplexity
+- Sitio web actualizado con nueva estructura de 3 planes (11/04/2026)
 
 ### Pendiente inmediato (pre-Sprint 0.0)
 - [ ] Confirmar URL OAI-PMH de DSpace UPeU (probar con `curl`)
