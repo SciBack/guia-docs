@@ -262,51 +262,120 @@ graph TB
 
 ---
 
-### Conector de identidad abstracto
+### El patron de integracion: midPoint como hub de correlacion
+
+midPoint no es "otro conector mas" — es la capa que hace posibles todos los conectores Campus. El problema que resuelve: **cada sistema universitario usa un ID distinto para el mismo usuario**.
+
+```
+Keycloak sabe al usuario como: "sub": "a3f9c..."  (UUID OIDC)
+Koha lo conoce como:           patron_id: 1234
+SIS lo conoce como:            student_id: UC-2021-00456
+ERP lo conoce como:            account: FIN-9012
+```
+
+Sin midPoint, GUIA tendria que hacer su propia logica de correlacion por universidad. Con midPoint, esa logica ya esta resuelta — midPoint mantiene los `shadows` (cuentas) de cada usuario en cada sistema.
 
 ```mermaid
-classDiagram
-    class GUIAConnector {
-        <<interface>>
-        +search(query, user_context) list~Result~
-        +get_user_info(user_id) dict
-        +get_status(user_id, entity) dict
-    }
+graph TB
+    subgraph auth["1. Autenticacion (Keycloak)"]
+        JWT["JWT token\nsub=a3f9c...\nroles=[estudiante_activo]"]
+    end
 
-    class IdentityConnector {
-        <<interface>>
-        +get_user_info(user_id) dict
-        +get_user_roles(user_id) list~str~
-        +is_active(user_id) bool
-    }
+    subgraph identity["2. Enriquecimiento de identidad (midPoint)"]
+        MP2["MidPointConnector\nGET /ws/rest/users?q=name=a3f9c"]
+        CANON2["Usuario canonico\nnombre: Juan Perez\nDNI: 12345678\nkoha_id: 1234\nsis_id: UC-2021-00456\nerp_id: FIN-9012\nroles: [estudiante_activo]"]
+    end
 
-    class KeycloakDirectConnector {
-        -keycloak_admin: KeycloakAdmin
-        +get_user_info(user_id) dict
-        +get_user_roles(user_id) list~str~
-    }
+    subgraph ops["3. Datos operacionales (conectores directos)"]
+        KOHA3["KohaConnector\nget_loans(patron_id=1234)\n→ 2 libros, vence en 3 dias"]
+        SIS3["SISConnector\nget_grades(student_id=UC-2021-00456)\n→ Estadistica: 16, Calculo: 14"]
+        ERP3["ERPConnector\nget_balance(account=FIN-9012)\n→ Debe S/. 450"]
+    end
 
-    class MidPointConnector {
-        -midpoint_url: str
-        -midpoint_auth: str
-        +get_user_info(user_id) dict
-        +get_user_roles(user_id) list~str~
-    }
+    subgraph answer["4. Respuesta GUIA"]
+        RESP["'Tienes 2 libros por vencer en 3 dias,\ntu nota de Estadistica es 16\ny debes S/. 450 de matricula'"]
+    end
 
-    class DSpaceConnector {
-        +search(query, user_context) list~Result~
-    }
+    JWT --> MP2 --> CANON2
+    CANON2 --> KOHA3 & SIS3 & ERP3
+    KOHA3 & SIS3 & ERP3 --> RESP
 
-    class KohaConnector {
-        +get_user_info(user_id) dict
-        +get_status(user_id, entity) dict
-    }
+    style identity fill:#2d1a4a,color:#fff
+    style ops fill:#1e3a5f,color:#fff
+    style answer fill:#1a4a2a,color:#fff
+```
 
-    GUIAConnector <|-- IdentityConnector
-    GUIAConnector <|-- DSpaceConnector
-    GUIAConnector <|-- KohaConnector
-    IdentityConnector <|.. KeycloakDirectConnector
-    IdentityConnector <|.. MidPointConnector
+**Regla clara:**
+
+| Pregunta | Quien responde |
+|----------|---------------|
+| Quien es este usuario? | midPoint |
+| Que ID tiene en Koha/SIS/ERP? | midPoint (shadows) |
+| Que libros tiene prestados? | Koha (directo, con el ID de midPoint) |
+| Cuales son sus notas? | SIS (directo, con el ID de midPoint) |
+| Cuanto debe? | ERP (directo, con el ID de midPoint) |
+
+### Implementacion del MidPointConnector
+
+```python
+@dataclass
+class CanonicalUser:
+    """Usuario canonico tal como lo ve GUIA — construido desde midPoint."""
+    name: str
+    display_name: str
+    email: str
+    dni: str
+    archetype: str              # ESTUDI / DOCEN / ADMIN / EGRES
+    is_active: bool
+    # IDs de shadows — para consultar sistemas operacionales
+    koha_patron_id: str | None
+    sis_student_id: str | None
+    erp_account_id: str | None
+    moodle_user_id: str | None
+    azure_object_id: str | None
+
+
+class MidPointConnector(IdentityConnector):
+    """
+    Consulta midPoint REST API para obtener el usuario canonico
+    con todos sus IDs de sistemas externos (account shadows).
+
+    midPoint sabe QUIEN es el usuario y en QUE sistemas existe.
+    Los conectores operacionales usan esos IDs para consultar datos reales.
+    """
+    def get_canonical_user(self, keycloak_sub: str) -> CanonicalUser:
+        # GET /ws/rest/users?q=name={keycloak_sub}
+        # Extrae shadows de cada recurso configurado
+        ...
+
+    def get_user_info(self, user_id: str) -> dict:
+        return asdict(self.get_canonical_user(user_id))
+
+    def get_user_roles(self, user_id: str) -> list[str]:
+        user = self.get_canonical_user(user_id)
+        return [user.archetype.lower(), "active" if user.is_active else "inactive"]
+
+
+class KeycloakDirectConnector(IdentityConnector):
+    """
+    Fallback para Fase 0 o universidades sin midPoint.
+    Solo puede dar info basica del token — sin IDs de sistemas externos.
+    """
+    def get_user_info(self, user_id: str) -> dict:
+        # Consulta Keycloak Admin API — solo nombre, email, roles
+        # NO sabe el patron_id en Koha ni el student_id en SIS
+        ...
+```
+
+**Beneficio del patron:** Los conectores operacionales son simples y uniformes — siempre reciben el ID correcto, sin necesidad de busquedas por email o DNI que pueden fallar por inconsistencias de datos.
+
+```python
+# Conector Koha: simple porque ya tiene el ID correcto
+class KohaConnector(GUIAConnector):
+    def get_loans(self, user_context: CanonicalUser) -> list[Loan]:
+        if not user_context.koha_patron_id:
+            return []  # usuario sin cuenta en Koha
+        return self.koha_api.get_patron_checkouts(user_context.koha_patron_id)
 ```
 
 ---
