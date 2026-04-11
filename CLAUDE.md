@@ -300,9 +300,21 @@ No usar en Fase 0: LangGraph, CrewAI, AutoGen (complejidad innecesaria para 1 de
 | Fase | Componente | Rol |
 |------|-----------|-----|
 | 0 | **Keycloak** solo | SSO via OIDC. Federa con AD/LDAP o broker de Google/Entra ID |
+| 0 (UPeU) | **midPoint + Keycloak** | Ya operativo. LAMB → midPoint → Koha + Azure EntraID → Keycloak |
 | 1+ | **midPoint + Keycloak** | midPoint sincroniza fuentes heterogeneas y crea usuario canonico. Keycloak emite tokens |
 
 **midPoint como estandarizador:** Absorbe la heterogeneidad de cada universidad. GUIA Node siempre consulta la misma API de midPoint, sin importar si detras hay AD, Google o un SIS en Oracle.
+
+**Estado actual del stack IGA (UPeU — pre-produccion 2026):**
+- MidPoint 4.9.5 UP en 192.168.15.230:8080
+- LAMB Academic (PostgreSQL SIS/ERP) conectado via JDBC
+- Koha conectado via `connector-koha` v1.1.0 (repo: UPeU-Infra/connector-koha, Java/ConnId)
+- Azure EntraID conectado — tenant sciback.com
+- Keycloak 26.6.0 federado con EntraID
+- 10 usuarios ficticios sci-* probados end-to-end con 3 shadows (LAMB + Koha + Azure)
+- GLPI pendiente de conectar (Fase Connect)
+
+**Proyecto paralelo activo:** `upeu-ops/context/iga/` — documentacion detallada del proyecto IGA UPeU.
 
 **Interfaz de identidad abstracta:**
 ```python

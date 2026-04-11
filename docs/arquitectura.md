@@ -29,8 +29,8 @@ graph TB
 |-----------|--------|-------|
 | **GUIA Node** | Self-hosted o SciBack-managed | Datos sensibles (notas, deudas). Necesita acceso a red interna (AD, SIS) |
 | **GUIA Hub** | SaaS (gestionado por SciBack) | Solo datos publicos. Un Hub central para N universidades |
-| **Keycloak** | Co-desplegado con el Node | Cada universidad tiene su realm |
-| **midPoint** | Opcional, co-desplegado | Solo para universidades con infra compleja |
+| **Keycloak** | Co-desplegado con el Node | Cada universidad tiene su realm. Emite tokens OIDC |
+| **midPoint IGA** | Co-desplegado (Campus+) | Estandarizador de identidad. Absorbe heterogeneidad de SIS, AD, ERP. GUIA siempre habla la misma API sin importar lo que haya detras |
 
 ---
 
@@ -195,7 +195,7 @@ Keycloak maneja 3 escenarios comunes de universidades LATAM:
 
 ---
 
-### Fase 1+ — midPoint + Keycloak (multiples fuentes heterogeneas)
+### Fase 0 (UPeU) / Fase 1+ (otras universidades) — midPoint + Keycloak
 
 ```mermaid
 graph TB
@@ -246,6 +246,19 @@ graph TB
 6. GUIA Node consulta **midPoint REST API** para atributos detallados
 
 **Beneficio clave:** El codigo de GUIA Node es identico en todas las universidades. midPoint absorbe toda la heterogeneidad.
+
+!!! success "Ya operativo en UPeU (piloto)"
+    El stack midPoint + Keycloak + Koha + Azure EntraID esta en pre-produccion en UPeU desde 2026.
+    Cuando GUIA Campus se despliegue en UPeU, esta capa ya esta construida y validada.
+
+    | Sistema | Estado en UPeU |
+    |---------|---------------|
+    | midPoint 4.9.5 | UP — 192.168.15.230:8080 |
+    | LAMB Academic (SIS/ERP) | Conectado via JDBC |
+    | Koha (biblioteca) | Conectado via connector-koha v1.1.0 |
+    | Azure EntraID | Conectado — tenant sciback.com |
+    | Keycloak 26.6.0 | UP — federado con EntraID |
+    | GLPI (helpdesk) | Pendiente (Fase Connect) |
 
 ---
 

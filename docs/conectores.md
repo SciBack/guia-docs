@@ -113,6 +113,50 @@ Preguntas tipicas:
 
 ---
 
+## midPoint IGA — El estandarizador (Capa 2+)
+
+midPoint no es un conector mas — es la **capa de integracion de identidad** que hace posible GUIA Campus y Connect a escala. En lugar de que GUIA construya conectores custom para cada SIS, ERP o directorio distinto, midPoint absorbe esa heterogeneidad y expone una API unificada.
+
+| Campo | Detalle |
+|-------|---------|
+| **Tecnologia** | MidPoint 4.9.5 (Evolveum) |
+| **Protocolo hacia GUIA** | REST API (`/ws/rest/users/`) |
+| **Conectores que gestiona** | LAMB Academic (JDBC), Koha (connector-koha v1.1.0), Azure EntraID, AD/LDAP, Keycloak |
+| **Estandares** | ISO/IEC 24760, SCIM 2.0, eduPerson, SCHAC |
+| **Plan** | Campus (requerido para datos personalizados) |
+
+**Lo que midPoint entrega a GUIA:**
+
+```python
+# GUIA siempre hace la misma consulta, sin importar lo que haya detras
+user = midpoint.get_user(user_id)
+# Devuelve usuario canonico con:
+# - nombre, email, DNI, carrera, ciclo
+# - roles: ["estudiante_activo", "facultad_ingenieria"]
+# - estado academico, estado en Koha, cuenta Azure
+```
+
+**Flujo Joiner-Mover-Leaver que GUIA aprovecha:**
+
+```
+Nuevo estudiante en LAMB → midPoint detecta → provisiona en Koha + Azure + Keycloak
+                                            → GUIA lo reconoce en su primer login
+Estudiante egresa → midPoint detecta → deshabilita en todos los sistemas
+                                     → GUIA cambia su perfil a egresado automaticamente
+```
+
+**connector-koha** — el puente entre midPoint y Koha esta desarrollado como proyecto open source:
+
+- Repo: `UPeU-Infra/connector-koha` (Java, ConnId framework)
+- Version: v1.1.0 — soporta BASIC + OAuth2, thread safety, retry backoff
+- Operaciones: crear, actualizar, buscar y deshabilitar patrones en Koha via REST API
+
+!!! info "Estado en UPeU"
+    midPoint con LAMB + Koha + Azure EntraID esta en pre-produccion desde 2026.
+    Cuando GUIA Campus se active en UPeU, esta capa **ya esta construida y probada**.
+
+---
+
 ## Capa 3 — Connect (licencia comercial SciBack)
 
 Conectores de integracion extendida. Disponibles en el plan **GUIA Connect**. Habilitan acciones (no solo consultas) y conectan GUIA con el ecosistema AI externo via MCP.
@@ -290,10 +334,17 @@ graph TB
         OJS["OJS\nOAI-PMH + REST"]
     end
 
+    subgraph iga["midPoint IGA — eje de identidad"]
+        MP["midPoint 4.9.5\nREST API"]
+        MP --> LAMB["LAMB / SIS\nJDBC"]
+        MP --> KHC["Koha\nconnector-koha v1.1.0"]
+        MP --> AZ["Azure EntraID\nMS Graph"]
+        MP --> KC["Keycloak\nOIDC + LDAP"]
+    end
+
     subgraph campus["GUIA Campus — Comercial"]
-        KC["Keycloak + AD/LDAP\nIdentidad SSO"]
-        KH["Koha\nBiblioteca"]
-        SI["SIS\nAcademico"]
+        SI["SIS via midPoint\nAcademico"]
+        KH["Koha via midPoint\nBiblioteca"]
         ER["ERP\nFinanzas"]
         MD["Moodle\nLMS"]
     end
@@ -309,7 +360,11 @@ graph TB
         MCP["MCP Server\nAI externas"]
     end
 
+    iga --> campus
+
     style research fill:#1a4a2a,color:#fff
+    style iga fill:#2d1a4a,color:#fff
     style campus fill:#1e3a5f,color:#fff
     style connect fill:#4a3a1a,color:#fff
+    style MP fill:#8e44ad,color:#fff,stroke:#f39c12,stroke-width:2px
 ```
