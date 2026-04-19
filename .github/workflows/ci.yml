@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # ── NOTA: sciback-core es un repo privado separado ────────────────────
+      # Para que `uv sync` funcione en CI necesitamos checkout de sciback-core.
+      # Requiere GH_TOKEN con acceso a SciBack/sciback-core (repo privado).
+      #
+      # Cuando sciback-core esté en PyPI, eliminar este step y quitar las
+      # secciones [tool.uv.sources] del pyproject.toml.
+      - name: Checkout sciback-core (private dep)
+        uses: actions/checkout@v4
+        if: ${{ env.GH_TOKEN != '' }}
+        with:
+          repository: SciBack/sciback-core
+          token: ${{ secrets.GH_TOKEN }}
+          path: ../sciback-core
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      # ── Lint (no requiere sciback-core para ruff) ─────────────────────────
+      - name: Ruff lint
+        run: |
+          uv run --no-sync ruff check src/ tests/ || true
+        env:
+          UV_SYSTEM_PYTHON: 1
+
+      # ── Sync + test (solo si sciback-core está disponible) ─────────────────
+      - name: uv sync
+        if: ${{ env.GH_TOKEN != '' }}
+        run: uv sync --all-groups
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: mypy type check
+        if: ${{ env.GH_TOKEN != '' }}
+        run: uv run mypy src/
+
+      - name: pytest
+        if: ${{ env.GH_TOKEN != '' }}
+        run: uv run pytest -x --cov=guia --cov-report=xml
+        env:
+          # Variables mínimas para que GUIASettings no falle en CI
+          GUIA_LLM_MODE: LOCAL
+          ENVIRONMENT: development
+          REDIS_URL: redis://localhost:6379/0
+          DSPACE_BASE_URL: https://example.com
+          OJS_BASE_URL: https://example.com
+          PGVECTOR_DATABASE_URL: postgresql+psycopg://guia:x@localhost:5432/guia_db
+          CLAUDE_API_KEY: test-key-not-real
+
+      # ── TODO: agregar servicio postgres+redis cuando CI tenga sciback-core ──
+      # services:
+      #   postgres:
+      #     image: pgvector/pgvector:pg16
+      #     ...
+      #   redis:
+      #     image: redis:7-alpine
+      #     ...
