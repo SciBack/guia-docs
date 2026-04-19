@@ -1,0 +1,87 @@
+[project]
+name = "guia-node"
+version = "0.1.0"
+description = "GUIA — Gateway Universitario de Información y Asistencia (Node app)"
+requires-python = ">=3.13"
+license = { text = "Apache-2.0" }
+readme = "README.md"
+authors = [{ name = "SciBack S.A.C.", email = "contacto@sciback.com" }]
+
+dependencies = [
+    # Plataforma SciBack (path deps — no están en PyPI aún)
+    "sciback-core>=0.11",
+    "sciback-adapter-dspace>=0.1",
+    "sciback-adapter-ojs>=0.1",
+    "sciback-adapter-alicia>=0.1",
+    "sciback-llm-claude>=0.1",
+    "sciback-llm-ollama>=0.1",
+    "sciback-embeddings-e5>=0.1",
+    "sciback-vectorstore-pgvector>=0.1",
+    # RAG + API
+    "llama-index>=0.12",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "chainlit>=2.0",
+    # Canales
+    "aiogram>=3.15",
+    # Cache + auth
+    "redis>=5.0",
+    "authlib>=1.3",
+    "pyjwt>=2.9",
+    # Config + validación
+    "pydantic>=2.9",
+    "pydantic-settings>=2.5",
+    # Scheduler + observabilidad
+    "apscheduler>=3.10",
+    "structlog>=24.4",
+    # CLI
+    "typer>=0.13",
+    # HTTP client
+    "httpx>=0.27",
+    # Dashboard
+    "streamlit>=1.40",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=5.0",
+    "ruff>=0.7",
+    "mypy>=1.13",
+]
+
+[tool.uv.sources]
+sciback-core = { path = "../sciback-core/packages/sciback-core", editable = true }
+sciback-adapter-dspace = { path = "../sciback-core/packages/sciback-adapter-dspace", editable = true }
+sciback-adapter-ojs = { path = "../sciback-core/packages/sciback-adapter-ojs", editable = true }
+sciback-adapter-alicia = { path = "../sciback-core/packages/sciback-adapter-alicia", editable = true }
+sciback-llm-claude = { path = "../sciback-core/packages/sciback-llm-claude", editable = true }
+sciback-llm-ollama = { path = "../sciback-core/packages/sciback-llm-ollama", editable = true }
+sciback-embeddings-e5 = { path = "../sciback-core/packages/sciback-embeddings-e5", editable = true }
+sciback-vectorstore-pgvector = { path = "../sciback-core/packages/sciback-vectorstore-pgvector", editable = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/guia"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "TCH", "PL"]
+ignore = ["PLR0913", "PLR2004"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+testpaths = ["tests"]

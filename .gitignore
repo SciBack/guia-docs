@@ -1,5 +1,49 @@
-.claude/
-site/
+# Python
+.venv/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Env
 .env
+.env.local
+.env.*.local
+
+# uv
+# uv.lock is intentionally NOT ignored — lock file is committed
+# Uncomment the next line only if you want to exclude it:
+# uv.lock
+
+# Data / generated
+data/
+site/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# mypy
+.mypy_cache/
+
+# Chainlit
+.chainlit/
+chainlit.md
+
+# Docker compose override
+docker-compose.override.yml

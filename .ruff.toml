@@ -1,0 +1,22 @@
+# Configuración ruff — misma que sciback-core
+line-length = 100
+target-version = "py313"
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "TCH", "PL"]
+ignore = [
+    "PLR0913",  # too many arguments
+    "PLR2004",  # magic value comparison
+    "PLC0415",  # import not at top-level (necesario para evitar circulares en services/cache)
+    "PLR0912",  # too many branches
+    "PLR0915",  # too many statements
+    "N817",     # CamelCase alias (CR es aceptable en contexto local)
+    "B019",     # lru_cache on method (aceptable con instancia singleton)
+    "TC001",    # app import in TYPE_CHECKING block (rompe Pydantic models en runtime)
+    "TC002",    # third-party import in TYPE_CHECKING block (rompe Protocol en runtime)
+    "B015",     # pointless comparison (false positive en asserts de tests)
+    "SIM108",   # ternary operator (a veces el if/else es más legible)
+]
+
+[lint.isort]
+known-first-party = ["guia"]
