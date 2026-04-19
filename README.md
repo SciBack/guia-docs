@@ -3,93 +3,63 @@
 **Gateway Universitario de Información y Asistencia**
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Documentation](https://img.shields.io/badge/docs-guia.sciback.com-green)](https://guia.sciback.com)
 
-Open source AI-native platform that unifies access to all university information in a single conversational interface. Instead of navigating 10 different systems, students, faculty, and staff ask GUIA — and GUIA answers via web chat, Telegram, WhatsApp, or Microsoft Teams.
+Repo del **app GUIA** — la plataforma open-core de asistencia AI institucional para universidades.
 
-> "What thesis exist about climate change?" · "Is my library loan overdue?" · "When does enrollment close?" — all in one place.
-
----
-
-## How it works
-
-GUIA connects institutional systems via a modular connector architecture:
-
-- **Research layer (open source):** harvests DSpace and OJS via OAI-PMH, processes full-text PDFs with GROBID, builds vector embeddings with pgvector, and answers research queries via RAG.
-- **Campus layer (commercial connectors):** Koha (library), SIS (academic records), ERP (finance), Moodle (LMS), Keycloak SSO.
-- **Hub (federation):** aggregates nodes from multiple universities, exposes OAI-PMH endpoint compatible with national networks (ALICIA, LA Referencia, OpenAIRE).
+> **Estado:** Sprint 0.0 pendiente. Este repo contendrá el código del app (Python + uv + FastAPI + LlamaIndex). Depende de `SciBack/sciback-core` (12 paquetes ya publicados).
 
 ---
 
-## Repositories
+## Documentación
 
-| Repository | Visibility | Contents |
-|-----------|-----------|----------|
-| **SciBack/guia** (this repo) | Public | Documentation + project website (MkDocs) |
-| **SciBack/guia-node** | Public (Apache 2.0) | Open source core: harvester, RAG, DSpace+OJS connectors, API, chat |
-| **SciBack/guia-campus** | Private | Commercial connectors: Koha, SIS, ERP, WhatsApp, Hub |
+Toda la documentación del ecosistema (arquitectura, roadmap, estándares, integraciones, modelo comercial) vive en **[docs.sciback.com](https://docs.sciback.com)** — repo: [`SciBack/sciback-core-docs`](https://github.com/SciBack/sciback-core-docs).
 
 ---
 
-## Documentation
+## Repositorios del ecosistema GUIA
 
-Full documentation at **[guia.sciback.com](https://guia.sciback.com)**
-
-- [Architecture](https://guia.sciback.com/arquitectura/) — Node + Hub design, identity, agent framework
-- [Standards](https://guia.sciback.com/estandares/) — ALICIA 2.1.0, COAR, RENATI, OpenAIRE metadata schemas
-- [Connectors](https://guia.sciback.com/conectores/) — GUIAConnector interface and available integrations
-- [Roadmap](https://guia.sciback.com/roadmap/) — Phase 0–3 plan with weekly sprints
+| Repositorio | Visibilidad | Contenido |
+|-------------|-------------|-----------|
+| **SciBack/guia** (este repo) | Private | Código del app (Sprint 0.0 pendiente) |
+| **SciBack/guia-node** | Public (Apache 2.0) | Core open source: harvester, RAG, DSpace/OJS, API, chat — **pendiente crear** |
+| **SciBack/guia-campus** | Private | Conectores comerciales: Koha, SIS, ERP, Moodle — **pendiente crear** |
+| **UPeU-Infra/guia-upeu** | Private | Config deploy UPeU (.env, overrides) — **pendiente crear** |
+| **SciBack/sciback-core** | Private | Plataforma Python (12 paquetes, 834 tests) |
+| **SciBack/sciback-core-docs** | Public | Documentación centralizada del ecosistema |
 
 ---
 
-## Local development (docs site)
+## Dependencias previstas
 
-```bash
-git clone https://github.com/SciBack/guia.git
-cd guia
-pip install -r requirements.txt
-python3 -m mkdocs serve
-# → http://localhost:8000
+```toml
+"sciback-core>=0.11",
+"sciback-adapter-dspace>=0.1",
+"sciback-adapter-ojs>=0.1",
+"sciback-adapter-alicia>=0.1",
+"sciback-llm-claude>=0.1",
+"sciback-llm-ollama>=0.1",
+"sciback-embeddings-e5>=0.1",
+"sciback-vectorstore-pgvector>=0.1",
+"llama-index>=0.12",
+"fastapi>=0.115",
+"chainlit>=2.0",
+"aiogram>=3.15",
 ```
 
 ---
 
-## Who is GUIA for?
+## Piloto
 
-- **Universities** in Latin America with DSpace and/or OJS installations
-- **Developers** who want to contribute connectors or extend the RAG engine
-- **Researchers** building on top of open academic repository infrastructure
-
-Pilot institution: **Universidad Peruana Unión (UPeU)**, Lima, Perú.
+Universidad Peruana Unión (UPeU), Lima, Perú — Fase 0 (abril–septiembre 2026).
 
 ---
 
-## Compliance
+## Contribuir
 
-GUIA is designed to comply with Peruvian and Latin American open access mandates:
+- [CONTRIBUTING.md](CONTRIBUTING.md) · [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · [SECURITY.md](SECURITY.md)
 
-- CONCYTEC / ALICIA 2.1.0 — institutional repository metadata
-- SUNEDU / RENATI — thesis and academic work metadata
-- Ley 30035 (Peru) — interoperable institutional repositories
-- OpenAIRE v4 / OAI-PMH — international interoperability
+## Licencia
 
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute documentation or report issues.
-For code contributions, see `SciBack/guia-node`.
-
-## Code of Conduct
-
-This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
-
-## Security
-
-To report a security vulnerability, see [SECURITY.md](SECURITY.md). Do not use public issues.
-
-## License
-
-Apache License 2.0 — see [LICENSE](LICENSE).
+Apache License 2.0 — ver [LICENSE](LICENSE).
 
 Copyright 2024–2026 [SciBack](https://sciback.com)
