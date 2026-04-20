@@ -10,7 +10,6 @@ Arranque:
 from __future__ import annotations
 
 import chainlit as cl
-from chainlit.types import ThreadDict
 
 from guia.config import GUIASettings
 from guia.container import GUIAContainer
@@ -37,7 +36,7 @@ def oauth_callback(
         logger.warning("oauth_rejected", email=email, provider=provider_id)
         return None  # rechaza cuentas que no son UPeU
 
-    name = str(raw_user_data.get("name", email.split("@")[0]))
+    name = str(raw_user_data.get("name", email.split("@", maxsplit=1)[0]))
     logger.info("oauth_login", email=email, name=name)
     return cl.User(identifier=email, metadata={"name": name, "provider": provider_id})
 
@@ -73,7 +72,7 @@ async def on_message(message: cl.Message) -> None:
             session_id=session_id,
             language="es",
         )
-        response = _container.chat_service.answer(request)
+        response = await _container.chat_service.answer(request)
 
         # Construir respuesta con fuentes
         answer_text = response.answer

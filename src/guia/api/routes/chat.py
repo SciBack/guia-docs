@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api", tags=["chat"])
 
 
 @router.post("/chat", response_model=ChatResponseSchema)
-def chat(
+async def chat(
     body: ChatRequestSchema,
     chat_svc: Annotated[ChatService, Depends(get_chat_service)],
 ) -> ChatResponseSchema:
@@ -25,7 +25,7 @@ def chat(
         session_id=body.session_id,
         language=body.language,
     )
-    response = chat_svc.answer(request)
+    response = await chat_svc.answer(request)
 
     return ChatResponseSchema(
         answer=response.answer,

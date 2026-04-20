@@ -86,3 +86,8 @@ class GUIASettings(BaseSettings):
     midpoint_username: str = "administrator"
     midpoint_password: str = ""
     midpoint_cache_ttl: int = 900
+
+    # M4: UserProfile Postgres (ADR-034) — reutiliza la misma DB que pgvector
+    # El adapter pgvector lee PGVECTOR_DATABASE_URL; lo espejamos aquí para
+    # que GUIAContainer pueda pasárselo a UserProfileRepository sin instanciar pgvector config.
+    pgvector_database_url: str = "postgresql+psycopg://guia:changeme@postgres:5432/guia_db"

@@ -118,7 +118,7 @@ async def main() -> None:
                 user_id=str(user_id),
                 language="es",
             )
-            response = container.chat_service.answer(request)
+            response = await container.chat_service.answer(request)
 
             answer = response.answer
             if response.sources:

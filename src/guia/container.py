@@ -11,10 +11,11 @@ from sciback_core.ports.llm import LLMPort
 from sciback_core.ports.vector_store import VectorStorePort
 
 from guia.config import GUIASettings, LLMMode
-from guia.search.backend import SyncSearchAdapter, get_search_adapter
+from guia.search.backend import SearchAdapter, get_search_adapter
 from guia.services.cache import SemanticCache
 from guia.services.chat import ChatService
 from guia.services.harvester import HarvesterService
+from guia.services.profile import UserProfileRepository
 from guia.services.search import SearchService
 
 
@@ -39,8 +40,6 @@ class GUIAContainer:
         from sciback_vectorstore_pgvector import PgVectorConfig, PgVectorStore
 
         # _env_file=None: evita que cada adapter lea el .env completo de GUIA
-        # (que contiene vars de otros adapters y causaría extra_forbidden).
-        # Las vars PGVECTOR_*, E5_*, CLAUDE_*, OLLAMA_* se exportan como env vars reales.
         pg_config = PgVectorConfig(_env_file=None)
         self.store: VectorStorePort = PgVectorStore(pg_config)
         self._pg_store_concrete = self.store  # para cleanup
@@ -63,18 +62,18 @@ class GUIAContainer:
             self.synthesis_llm = self._build_claude()
             self.classifier_llm = self._build_ollama()
 
-        # Adapters de fuentes (opcionales — pueden no estar configurados)
+        # Adapters de fuentes (opcionales)
         self.dspace_adapter = self._try_build_dspace()
         self.ojs_adapter = self._try_build_ojs()
         self.alicia_harvester = self._try_build_alicia()
 
-        # M3: Search backend (ADR-029) — None si backend=pgvector
-        self.search_adapter: SyncSearchAdapter | None = get_search_adapter(
+        # M4: SearchAdapter async (ADR-029) — None si backend=pgvector
+        self.search_adapter: SearchAdapter | None = get_search_adapter(
             self.settings.search_backend,
             self.store,
         )
 
-        # Redis para caché semántico
+        # Redis para caché semántico y sesiones
         self._redis = redis.from_url(self.settings.redis_url, decode_responses=True)
 
     def _build_claude(self) -> LLMPort:
@@ -117,13 +116,14 @@ class GUIAContainer:
             threshold=self.settings.semantic_cache_threshold,
         )
 
+        # M4: ChatService async — usa hybrid_dicts() con await
         self.chat_service = ChatService(
             synthesis_llm=self.synthesis_llm,
             store=self.store,
             embedder=self.embedder,
             classifier_llm=self.classifier_llm,
             cache=self.cache,
-            search_adapter=self.search_adapter,  # M3: usa hybrid_sync cuando disponible
+            search_adapter=self.search_adapter,
         )
 
         self.search_service = SearchService(
@@ -139,6 +139,12 @@ class GUIAContainer:
             alicia=self.alicia_harvester,  # type: ignore[arg-type]
         )
 
+        # M4: UserProfileRepository — perfiles persistentes en Postgres (ADR-034)
+        self.profile_repository = UserProfileRepository(
+            database_url=self.settings.pgvector_database_url,  # type: ignore[attr-defined]
+        )
+        self.profile_repository.initialize()
+
     def close(self) -> None:
         """Libera recursos (conexiones pool, etc.)."""
         if hasattr(self._pg_store_concrete, "close"):
@@ -146,4 +152,5 @@ class GUIAContainer:
         if self.search_adapter is not None:
             import asyncio
             asyncio.run(self.search_adapter.close())
+        self.profile_repository.close()
         self._redis.close()

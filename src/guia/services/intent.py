@@ -1,10 +1,11 @@
 """IntentClassifier — clasifica la intención del usuario.
 
-Usa el LLMPort (Qwen 2.5 3B en modo LOCAL/HYBRID, Claude en CLOUD) para
-mapear el texto de la consulta a uno de los 4 intents definidos.
+M4: classify() es async, usa asyncio.to_thread() para no bloquear el event loop.
 """
 
 from __future__ import annotations
+
+import asyncio
 
 from sciback_core.ports.llm import LLMMessage, LLMPort
 
@@ -33,8 +34,8 @@ _INTENT_MAP: dict[str, Intent] = {
 class IntentClassifier:
     """Clasifica la intención del usuario usando un LLM.
 
-    Diseñado para usar un modelo ligero (Qwen 2.5 3B) en modo LOCAL/HYBRID
-    para minimizar latencia y costo. En modo CLOUD usa el mismo LLM principal.
+    M4: classify() es async — usa asyncio.to_thread() para el LLM sync.
+    Diseñado para usar un modelo ligero (Qwen 2.5 3B) en LOCAL/HYBRID.
 
     Args:
         llm: Implementación de LLMPort.
@@ -43,8 +44,8 @@ class IntentClassifier:
     def __init__(self, llm: LLMPort) -> None:
         self._llm = llm
 
-    def classify(self, query: str) -> Intent:
-        """Clasifica la intención de la query.
+    async def classify(self, query: str) -> Intent:
+        """Clasifica la intención de la query (async).
 
         Args:
             query: Texto del usuario.
@@ -52,6 +53,18 @@ class IntentClassifier:
         Returns:
             Intent detectado. Retorna GENERAL si el LLM responde algo inesperado.
         """
+        messages = [
+            LLMMessage(role="system", content=_SYSTEM_PROMPT),
+            LLMMessage(role="user", content=query.strip()),
+        ]
+        response = await asyncio.to_thread(
+            self._llm.complete, messages, max_tokens=10, temperature=0.0
+        )
+        raw = response.content.strip().lower().rstrip(".,;")
+        return _INTENT_MAP.get(raw, Intent.GENERAL)
+
+    def classify_sync(self, query: str) -> Intent:
+        """Versión sync — solo para contextos sin event loop (tests, Celery)."""
         messages = [
             LLMMessage(role="system", content=_SYSTEM_PROMPT),
             LLMMessage(role="user", content=query.strip()),

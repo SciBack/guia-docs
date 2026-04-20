@@ -70,10 +70,17 @@ async def export_profile(
     """
     logger.info("profile_export_requested", user_id=user.user_id)
 
-    # M3: datos básicos desde el token + sesión Redis
+    container = request.app.state.container
+    profile_repo = getattr(container, "profile_repository", None)
+
+    # M4: leer perfil desde Postgres
+    db_profile = None
+    if profile_repo is not None:
+        db_profile = await profile_repo.get(user.user_id)
+
+    # Sesión Redis (complementaria)
     redis_client = getattr(request.app.state, "redis", None)
     session_data: dict = {}
-
     if redis_client is not None:
         try:
             session_key = f"guia:session:{user.user_id}"
@@ -85,18 +92,16 @@ async def export_profile(
         "user_id": user.user_id,
         "email": user.email,
         "domain": user.domain,
-        "display_name": user.display_name,
+        "display_name": db_profile.display_name if db_profile else user.display_name,
         "roles": user.roles,
         "is_staff": user.is_staff,
         "session": session_data,
-        # M4: historial de queries, preferencias, opt-ins desde Postgres
         "query_history": [],
-        "preferences": {},
         "opt_ins": {
-            "personalization": False,  # M4: leer desde UserProfile
-            "analytics": False,
+            "personalization": db_profile.opt_personalization if db_profile else False,
+            "analytics": db_profile.opt_analytics if db_profile else False,
         },
-        "_note": "M3: datos completos disponibles en M4 con UserProfile persistido",
+        "member_since": db_profile.created_at.isoformat() if db_profile else None,
     }
 
 
