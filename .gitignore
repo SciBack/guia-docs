@@ -47,3 +47,6 @@ chainlit.md
 
 # Docker compose override
 docker-compose.override.yml
+
+# Git worktrees (generados por Claude Code)
+.claude/worktrees/
