@@ -20,7 +20,7 @@ def test_default_settings_without_env() -> None:
     original = {k: os.environ.pop(k, None) for k in env_vars}
 
     try:
-        settings = GUIASettings()
+        settings = GUIASettings(_env_file=None)  # ignora .env del lab local
         assert settings.guia_llm_mode == LLMMode.HYBRID
         assert settings.environment == "development"
         assert settings.redis_url == "redis://localhost:6379/0"
