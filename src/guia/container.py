@@ -37,13 +37,14 @@ class GUIAContainer:
         from sciback_embeddings_e5 import E5Config, E5EmbeddingAdapter
         from sciback_vectorstore_pgvector import PgVectorConfig, PgVectorStore
 
-        # Vector store — siempre pgvector en producción
-        pg_config = PgVectorConfig()
+        # _env_file=None: evita que cada adapter lea el .env completo de GUIA
+        # (que contiene vars de otros adapters y causaría extra_forbidden).
+        # Las vars PGVECTOR_*, E5_*, CLAUDE_*, OLLAMA_* se exportan como env vars reales.
+        pg_config = PgVectorConfig(_env_file=None)
         self.store: VectorStorePort = PgVectorStore(pg_config)
         self._pg_store_concrete = self.store  # para cleanup
 
-        # Embedder — siempre E5 (mismo para LOCAL, HYBRID y CLOUD)
-        self.embedder = E5EmbeddingAdapter(E5Config())
+        self.embedder = E5EmbeddingAdapter(E5Config(_env_file=None))
 
         # LLMs según modo
         mode = self.settings.guia_llm_mode
@@ -71,11 +72,11 @@ class GUIAContainer:
 
     def _build_claude(self) -> LLMPort:
         from sciback_llm_claude import ClaudeConfig, ClaudeLLMAdapter
-        return ClaudeLLMAdapter(ClaudeConfig())
+        return ClaudeLLMAdapter(ClaudeConfig(_env_file=None))
 
     def _build_ollama(self) -> LLMPort:
         from sciback_llm_ollama import OllamaConfig, OllamaLLMAdapter
-        return OllamaLLMAdapter(OllamaConfig())
+        return OllamaLLMAdapter(OllamaConfig(_env_file=None))
 
     def _try_build_dspace(self) -> object:
         try:
