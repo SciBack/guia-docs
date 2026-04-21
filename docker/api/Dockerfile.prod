@@ -1,0 +1,58 @@
+# ── Dockerfile.prod — GUIA Node (producción) ──────────────────
+#
+# Contexto de build: directorio PADRE de guia/ (ej: /opt)
+# Requiere en el mismo nivel:
+#   guia/           ← repo SciBack/guia
+#   sciback-core/   ← repo SciBack/sciback-core (privado)
+#
+# Build desde docker-compose.prod.yml:
+#   context: ..    (el padre de guia/, donde están ambos repos)
+#   dockerfile: guia/docker/api/Dockerfile.prod
+# ─────────────────────────────────────────────────────────────
+
+# ── Stage 1: dependencias ─────────────────────────────────────
+FROM python:3.13-slim AS builder
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+WORKDIR /build/guia
+
+# Copiar manifiestos de guia
+COPY guia/pyproject.toml .
+COPY guia/uv.lock* ./
+
+# Copiar sciback-core completo (path deps: ../sciback-core/packages/*)
+COPY sciback-core/ /build/sciback-core/
+
+# Instalar dependencias (sin el proyecto, para cachear esta capa)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev
+
+# ── Stage 2: runtime ──────────────────────────────────────────
+FROM python:3.13-slim
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copiar venv del builder (incluye todos los paquetes sciback-*)
+COPY --from=builder /build/guia/.venv /app/.venv
+
+# Copiar código fuente de guia
+COPY guia/src/ ./src/
+
+# Activar venv
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH="/app/src"
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Usuario no-root
+RUN useradd -m -u 1000 guia && chown -R guia:guia /app
+USER guia
+
+EXPOSE 8000
+
+CMD ["python", "-m", "guia", "serve"]

@@ -1,0 +1,178 @@
+# ── docker-compose.prod.yml — GUIA Node producción ────────────
+#
+# Ejecutar desde el servidor de producción en /opt/guia:
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Pre-requisitos:
+#   - /opt/guia/          → git clone SciBack/guia
+#   - /opt/sciback-core/  → git clone SciBack/sciback-core
+#   - /opt/guia/.env      → copiar y completar desde .env.example
+#
+# Build context: directorio padre /opt
+#   (resuelve path deps ../sciback-core/packages/*)
+#
+# Servicios incluidos (piloto):
+#   postgres, redis, api, chainlit, telegram, scheduler, dashboard, nginx
+#
+# Servicios EXCLUIDOS (piloto):
+#   opensearch, opensearch-dashboards — SEARCH_BACKEND=pgvector
+#   keycloak — usar keyid.upeu.edu.pe (externo)
+#   rabbitmq, celery-worker-*, celery-beat — scheduler directo
+#   grobid — Fase 1
+# ──────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Infraestructura base ────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-guia_db}
+      POSTGRES_USER: ${POSTGRES_USER:-guia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD requerido}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    # Sin puerto expuesto — solo red interna Docker
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-guia} -d ${POSTGRES_DB:-guia_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    # Sin puerto expuesto — solo red interna Docker
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # ── GUIA servicios ────────────────────────────────────────────
+  api:
+    build:
+      context: ..
+      dockerfile: guia/docker/api/Dockerfile.prod
+    command: python -m guia serve
+    env_file: .env
+    environment:
+      SEARCH_BACKEND: pgvector
+    # Sin puerto expuesto — nginx hace proxy
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  chainlit:
+    build:
+      context: ..
+      dockerfile: guia/docker/api/Dockerfile.prod
+    command: chainlit run src/guia/channels/chainlit_app.py --host 0.0.0.0 --port 8001
+    env_file: .env
+    environment:
+      SEARCH_BACKEND: pgvector
+    # Sin puerto expuesto — nginx hace proxy
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  telegram:
+    build:
+      context: ..
+      dockerfile: guia/docker/api/Dockerfile.prod
+    command: python -m guia.channels.telegram_bot
+    env_file: .env
+    environment:
+      SEARCH_BACKEND: pgvector
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  scheduler:
+    build:
+      context: ..
+      dockerfile: guia/docker/api/Dockerfile.prod
+    command: python -m guia.scheduler
+    env_file: .env
+    environment:
+      SEARCH_BACKEND: pgvector
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: ..
+      dockerfile: guia/docker/api/Dockerfile.prod
+    command: streamlit run src/guia/dashboard/app.py --server.port 8501 --server.address 0.0.0.0
+    env_file: .env
+    environment:
+      SEARCH_BACKEND: pgvector
+    # Sin puerto expuesto — nginx hace proxy
+    depends_on:
+      postgres:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ── Reverse proxy ─────────────────────────────────────────────
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      api:
+        condition: service_healthy
+      chainlit:
+        condition: service_healthy
+      dashboard:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
