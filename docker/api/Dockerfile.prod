@@ -51,6 +51,10 @@ COPY --from=builder /build/sciback-core /build/sciback-core
 # Copiar código fuente de guia
 COPY guia/src/ ./src/
 
+# Copiar assets estáticos y config de Chainlit
+COPY guia/public/ ./public/
+COPY guia/.chainlit/ ./.chainlit/
+
 # Activar venv
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH="/app/src"

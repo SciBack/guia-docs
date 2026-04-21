@@ -84,6 +84,10 @@ services:
     env_file: .env
     environment:
       SEARCH_BACKEND: pgvector
+    volumes:
+      # Montados desde el repo (git pull actualiza sin rebuild)
+      - ./public:/app/public:ro
+      - ./.chainlit:/app/.chainlit:ro
     # Sin puerto expuesto — nginx hace proxy
     depends_on:
       postgres:
