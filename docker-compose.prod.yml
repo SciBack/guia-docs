@@ -122,8 +122,8 @@ services:
     build:
       context: ..
       dockerfile: guia/docker/api/Dockerfile.prod
-    # Sprint 0.7 — stub sin implementar. Habilitar cuando jobs estén listos.
-    command: python -c "import time; print('scheduler: waiting for implementation'); time.sleep(3600)"
+    # Sprint 0.7 - stub sin implementar. Habilitar cuando jobs esten listos.
+    command: ["python", "-c", "import time; time.sleep(3600)"]
     env_file: .env
     environment:
       SEARCH_BACKEND: pgvector
