@@ -40,6 +40,10 @@ WORKDIR /app
 # Copiar venv del builder (incluye todos los paquetes sciback-*)
 COPY --from=builder /build/guia/.venv /app/.venv
 
+# Copiar sciback-core al mismo path que el venv espera
+# (editable installs tienen .pth files apuntando a /build/sciback-core/)
+COPY --from=builder /build/sciback-core /build/sciback-core
+
 # Copiar código fuente de guia
 COPY guia/src/ ./src/
 
