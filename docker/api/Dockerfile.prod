@@ -11,11 +11,15 @@
 # ─────────────────────────────────────────────────────────────
 
 # ── Stage 1: dependencias ─────────────────────────────────────
+# IMPORTANTE: WORKDIR debe ser /app para que los shebangs de los scripts
+# generados por uv (chainlit, streamlit, etc.) apunten a /app/.venv/bin/python,
+# que es el mismo path que usa Stage 2. Si se cambia este path, cambiar también
+# en Stage 2.
 FROM python:3.13-slim AS builder
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-WORKDIR /build/guia
+WORKDIR /app
 
 # Copiar manifiestos de guia
 COPY guia/pyproject.toml .
@@ -37,8 +41,8 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-# Copiar venv del builder (incluye todos los paquetes sciback-*)
-COPY --from=builder /build/guia/.venv /app/.venv
+# Copiar venv del builder (shebangs apuntan a /app/.venv/bin/python ✓)
+COPY --from=builder /app/.venv /app/.venv
 
 # Copiar sciback-core al mismo path que el venv espera
 # (editable installs tienen .pth files apuntando a /build/sciback-core/)

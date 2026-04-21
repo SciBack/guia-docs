@@ -80,7 +80,7 @@ services:
     build:
       context: ..
       dockerfile: guia/docker/api/Dockerfile.prod
-    command: chainlit run src/guia/channels/chainlit_app.py --host 0.0.0.0 --port 8001
+    command: python /app/.venv/bin/chainlit run src/guia/channels/chainlit_app.py --host 0.0.0.0 --port 8001
     env_file: .env
     environment:
       SEARCH_BACKEND: pgvector
@@ -135,7 +135,7 @@ services:
     build:
       context: ..
       dockerfile: guia/docker/api/Dockerfile.prod
-    command: streamlit run src/guia/dashboard/app.py --server.port 8501 --server.address 0.0.0.0
+    command: python /app/.venv/bin/streamlit run src/guia/dashboard/app.py --server.port 8501 --server.address 0.0.0.0
     env_file: .env
     environment:
       SEARCH_BACKEND: pgvector
