@@ -86,8 +86,9 @@ services:
       SEARCH_BACKEND: pgvector
     volumes:
       # Montados desde el repo (git pull actualiza sin rebuild)
+      # Solo config.toml — no el dir completo: Chainlit necesita escribir translations/
       - ./public:/app/public:ro
-      - ./.chainlit:/app/.chainlit:ro
+      - ./.chainlit/config.toml:/app/.chainlit/config.toml:ro
     # Sin puerto expuesto — nginx hace proxy
     depends_on:
       postgres:
