@@ -1,49 +1,48 @@
-// Auto-redirige al login de UPeU sin mostrar la pantalla intermedia de Chainlit.
-// Cliquea el primer botón OAuth disponible en la página de login.
+// Auto-redirige al login de UPeU en cuanto React monta el botón OAuth.
+// Usa MutationObserver para detectar cuando Chainlit inserta el botón al DOM.
 (function () {
-  var MAX_ATTEMPTS = 30;
-  var INTERVAL_MS = 200;
-
   function clickOAuthButton() {
-    // Chainlit renderiza botones OAuth con data-testid o dentro del form de login
     var buttons = document.querySelectorAll("button");
     for (var i = 0; i < buttons.length; i++) {
-      var btn = buttons[i];
-      var text = btn.textContent || btn.innerText || "";
-      // Coincide con cualquier variante del botón OAuth (upeu, Correo, etc.)
-      if (
-        text.toLowerCase().includes("upeu") ||
-        text.toLowerCase().includes("correo") ||
-        text.toLowerCase().includes("continuar con")
-      ) {
-        btn.click();
+      var text = (buttons[i].textContent || "").toLowerCase();
+      if (text.includes("upeu") || text.includes("correo") || text.includes("continuar con")) {
+        buttons[i].click();
         return true;
       }
     }
     return false;
   }
 
-  function tryClick(remaining) {
-    if (remaining <= 0) return;
-    if (!clickOAuthButton()) {
-      setTimeout(function () { tryClick(remaining - 1); }, INTERVAL_MS);
-    }
+  function isLoginPage() {
+    return window.location.pathname === "/login" ||
+           window.location.pathname === "/";
   }
 
-  // Solo actuar en la página de login
-  function onNavigate() {
-    var path = window.location.pathname;
-    if (path === "/login" || path === "/" || path === "") {
-      tryClick(MAX_ATTEMPTS);
-    }
-  }
+  function startObserver() {
+    if (!isLoginPage()) return;
 
-  // Arrancar cuando el DOM esté listo
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function () {
-      setTimeout(function () { onNavigate(); }, 300);
+    // Intento inmediato por si el botón ya está
+    if (clickOAuthButton()) return;
+
+    // MutationObserver: dispara cada vez que React cambia el DOM
+    var observer = new MutationObserver(function () {
+      if (clickOAuthButton()) {
+        observer.disconnect();
+      }
     });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Seguro: desconectar después de 10 segundos
+    setTimeout(function () { observer.disconnect(); }, 10000);
+  }
+
+  if (document.body) {
+    startObserver();
   } else {
-    setTimeout(function () { onNavigate(); }, 300);
+    document.addEventListener("DOMContentLoaded", startObserver);
   }
 })();
