@@ -41,8 +41,9 @@ htmlcov/
 # mypy
 .mypy_cache/
 
-# Chainlit
-.chainlit/
+# Chainlit — config.toml sí se versiona (branding GUIA)
+.chainlit/translations/
+.chainlit/*.json
 chainlit.md
 
 # Docker compose override
