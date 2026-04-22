@@ -259,12 +259,11 @@ body:has(form.flex) form button[type="button"]:focus-visible {
    JS inyecta <canvas class="guia-canvas">; <img> oculto.
    ══════════════════════════════════════════════════════════════ */
 
-body:has(form.flex) div.grid > div:last-child {
+body:has(form.flex) div.bg-muted.overflow-hidden {
   position: relative !important;
-  overflow: hidden !important;
 }
 
-body:has(form.flex) div.grid > div:last-child > img {
+body:has(form.flex) div.bg-muted.overflow-hidden > img {
   display: none !important;
 }
 

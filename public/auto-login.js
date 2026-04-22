@@ -79,11 +79,9 @@
   ];
 
   function injectKnowledgeGraph() {
-    var panel = document.querySelector('div.grid > div:last-child');
+    var panel = document.querySelector('div.bg-muted.overflow-hidden');
     if (!panel) return false;
     if (panel.querySelector('.guia-canvas')) return true;
-    // El panel tiene que tener algo (img u otros hijos) para estar listo
-    if (!panel.children.length) return false;
 
     var canvas = document.createElement('canvas');
     canvas.className = 'guia-canvas';
