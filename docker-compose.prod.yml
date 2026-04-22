@@ -12,13 +12,14 @@
 #   (resuelve path deps ../sciback-core/packages/*)
 #
 # Servicios incluidos (piloto):
-#   postgres, redis, api, chainlit, telegram, scheduler, dashboard, nginx
+#   postgres, redis, api, chainlit, telegram, scheduler, dashboard
 #
 # Servicios EXCLUIDOS (piloto):
+#   nginx     — proxy reverso gestionado por DTI UPeU (Rudy), igual que Keycloak
 #   opensearch, opensearch-dashboards — SEARCH_BACKEND=pgvector
-#   keycloak — usar keyid.upeu.edu.pe (externo)
+#   keycloak  — usar keyid.upeu.edu.pe (externo)
 #   rabbitmq, celery-worker-*, celery-beat — scheduler directo
-#   grobid — Fase 1
+#   grobid    — Fase 1
 # ──────────────────────────────────────────────────────────────
 
 services:
@@ -63,7 +64,8 @@ services:
     env_file: .env
     environment:
       SEARCH_BACKEND: pgvector
-    # Sin puerto expuesto — nginx hace proxy
+    ports:
+      - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -90,7 +92,8 @@ services:
       # .chainlit/ :rw — Chainlit escribe translations/ al arrancar (diseño del framework)
       - ./public:/app/public:ro
       - ./.chainlit:/app/.chainlit:rw
-    # Sin puerto expuesto — nginx hace proxy
+    ports:
+      - "8001:8001"
     depends_on:
       postgres:
         condition: service_healthy
@@ -148,7 +151,8 @@ services:
     env_file: .env
     environment:
       SEARCH_BACKEND: pgvector
-    # Sin puerto expuesto — nginx hace proxy
+    ports:
+      - "8501:8501"
     depends_on:
       postgres:
         condition: service_healthy
@@ -161,26 +165,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # ── Reverse proxy ─────────────────────────────────────────────
-  nginx:
-    image: nginx:1.27-alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./docker/nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      api:
-        condition: service_healthy
-      chainlit:
-        condition: service_healthy
-      dashboard:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "nginx", "-t"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-    restart: unless-stopped
 
 volumes:
   postgres_data:
