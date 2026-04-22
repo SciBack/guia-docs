@@ -170,15 +170,6 @@
     guiaObserver.observe(document.body, { childList: true, subtree: true });
 
     if (isLoginPage()) {
-      // OAuth auto-click
-      if (!clickOAuthButton()) {
-        var oauthObs = new MutationObserver(function () {
-          if (clickOAuthButton()) oauthObs.disconnect();
-        });
-        oauthObs.observe(document.body, { childList: true, subtree: true });
-        setTimeout(function () { oauthObs.disconnect(); }, 10000);
-      }
-
       // SVG radar
       if (!injectRadar()) {
         var radarObs = new MutationObserver(function () {
