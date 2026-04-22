@@ -97,7 +97,17 @@
 
     // Icono usuario en el botón OAuth
     var btn = form.querySelector('button[type="button"]');
-    if (btn) btn.insertAdjacentHTML('afterbegin', USER_ICON);
+    if (btn) {
+      btn.insertAdjacentHTML('afterbegin', USER_ICON);
+      // Reemplazar texto del botón (Chainlit lo genera desde el nombre del provider)
+      var nodes = btn.childNodes;
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].nodeType === 3 && nodes[i].textContent.trim()) {
+          nodes[i].textContent = ' Ingresa con tu correo UPeU';
+          break;
+        }
+      }
+    }
 
     return true;
   }
