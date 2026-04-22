@@ -301,6 +301,21 @@ body:has(form.flex) div.bg-muted.overflow-hidden > img {
    QUERIES ROTATIVAS — overlay sobre el video (panel derecho)
    ══════════════════════════════════════════════════════════════ */
 
+/* Degradado fijo en la base del video — independiente de la posición del overlay */
+.guia-bottom-fade {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 55% !important;
+  background: linear-gradient(to top,
+    rgba(0, 8, 18, 0.92) 0%,
+    rgba(0, 8, 18, 0.50) 55%,
+    transparent 100%) !important;
+  pointer-events: none !important;
+  z-index: 8 !important;
+}
+
 .guia-qoverlay {
   position: absolute !important;
   bottom: 12% !important;
@@ -309,11 +324,6 @@ body:has(form.flex) div.bg-muted.overflow-hidden > img {
   padding: 0 52px !important;
   z-index: 10 !important;
   pointer-events: none !important;
-  /* Degradado desde abajo para que las queries sean legibles sobre el video */
-  background: linear-gradient(to top,
-    rgba(0, 8, 18, 0.88) 0%,
-    rgba(0, 8, 18, 0.55) 60%,
-    transparent 100%) !important;
 }
 
 .guia-qoverlay-label {

@@ -143,10 +143,15 @@
     panel.appendChild(video);
     video.play().catch(function () {});
 
-    // Overlay oscuro
+    // Overlay lateral izquierdo
     var overlay = document.createElement('div');
     overlay.className = 'guia-video-overlay';
     panel.appendChild(overlay);
+
+    // Degradado fijo en la base — siempre pegado al fondo del panel
+    var bottomFade = document.createElement('div');
+    bottomFade.className = 'guia-bottom-fade';
+    panel.appendChild(bottomFade);
 
     // Queries rotativas sobre el video — grupos de 3
     var qbox = document.createElement('div');
