@@ -171,58 +171,37 @@
 
     // Rotación por grupos de 3
     // Transición: salida hacia arriba (exit-up) → entrada desde abajo (enter-down)
-    var groupIdx = 1; // próximo grupo a mostrar (grupo 0 ya visible)
+    // Rotación por grupos de 3 — solo fade, sin slide
+    var groupIdx = 1;
     var GROUPS = Math.ceil(QUERIES.length / 3);
-    var EXIT_MS = 420;
-    var PAUSE_MS = 80;
-    var VISIBLE_MS = 3200;
+    var FADE_MS = 500;
+    var VISIBLE_MS = 3000;
 
     function rotateGroup() {
       var items = qlist.querySelectorAll('.guia-qoverlay-item');
 
-      // 1. Salida: todos suben y desaparecen
-      items.forEach(function (el) { el.classList.add('q-exit'); });
+      // 1. Fade out
+      items.forEach(function (el) { el.classList.add('q-hidden'); });
 
       setTimeout(function () {
-        // 2. Reposicionar abajo sin transición
-        items.forEach(function (el) {
-          el.classList.remove('q-exit');
-          el.classList.add('q-enter');
-        });
-
-        // 3. Actualizar texto del nuevo grupo
+        // 2. Cambiar texto mientras están invisibles
         var base = (groupIdx % GROUPS) * 3;
         items.forEach(function (el, i) {
           var qi = base + i;
           el.textContent = qi < QUERIES.length ? QUERIES[qi] : '';
         });
-
         groupIdx++;
 
-        // 4. Forzar reflow para que la transición de entrada sea visible
-        void qlist.offsetHeight;
-
-        // 5. Entrada: suben desde abajo al sitio
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            items.forEach(function (el, i) {
-              el.classList.remove('q-enter');
-              el.style.transitionDelay = (i * 60) + 'ms';
-            });
-            // Limpiar delay después de la transición
-            setTimeout(function () {
-              items.forEach(function (el) { el.style.transitionDelay = ''; });
-            }, EXIT_MS + 200);
-          });
+        // 3. Fade in con stagger suave
+        items.forEach(function (el, i) {
+          setTimeout(function () { el.classList.remove('q-hidden'); }, i * 80);
         });
-
-      }, EXIT_MS + PAUSE_MS);
+      }, FADE_MS);
     }
 
-    // Primera rotación después de VISIBLE_MS, luego ciclo continuo
     setTimeout(function () {
       rotateGroup();
-      setInterval(rotateGroup, VISIBLE_MS + EXIT_MS + PAUSE_MS + 100);
+      setInterval(rotateGroup, VISIBLE_MS + FADE_MS + 300);
     }, VISIBLE_MS);
 
     return true;
