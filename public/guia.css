@@ -138,60 +138,60 @@ body:has(form.flex) form.flex::after {
   display: block !important;
   flex-shrink: 0 !important;
   text-align: left !important;
-  font-size: 5.5rem !important;
+  font-size: clamp(6.5rem, 14vw, 9.5rem) !important;
   font-weight: 900 !important;
-  letter-spacing: -0.06em !important;
-  line-height: 0.92 !important;
+  letter-spacing: -0.07em !important;
+  line-height: 0.88 !important;
   margin-bottom: 0 !important;
-  background: linear-gradient(145deg, #c5e8fd 0%, var(--g-blue) 40%, #1a7fcf 100%) !important;
+  background: linear-gradient(145deg, #d6effe 0%, var(--g-blue) 38%, #1270b8 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
-  animation: g-fade-up 700ms var(--g-ease) both !important;
+  animation: g-fade-up 500ms var(--g-ease) both !important;
 }
 
 /* ── h1 — tagline secundario ─────────────────────────────────── */
 body:has(form.flex) form h1 {
   font-size: 0.85rem !important;
   font-weight: 400 !important;
-  color: rgba(255, 255, 255, 0.42) !important;
+  color: rgba(255, 255, 255, 0.40) !important;
   text-align: left !important;
   letter-spacing: 0.01em !important;
   line-height: 1.5 !important;
   padding: 0 !important;
   margin: 0 !important;
-  animation: g-fade-up 700ms var(--g-ease) 120ms both !important;
+  animation: g-fade-up 380ms var(--g-ease) 100ms both !important;
 }
 
 body:has(form.flex) form h1::before { display: none !important; }
 
 /* ── Acrónimo (inyectado por JS) ─────────────────────────────── */
 .guia-acronym {
-  font-size: 0.60rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
-  color: rgba(46, 163, 242, 0.55);
+  color: rgba(46, 163, 242, 0.52);
   text-align: left;
-  margin-top: 6px;
-  animation: g-fade-up 700ms var(--g-ease) 60ms both;
+  margin-top: 8px;
+  animation: g-fade-up 380ms var(--g-ease) 60ms both;
 }
 
 /* ── Ejemplos de consultas (inyectados por JS) ──────────────── */
 .guia-queries {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  animation: g-fade-up 700ms var(--g-ease) 160ms both;
+  gap: 7px;
 }
 
 .guia-queries-label {
-  font-size: 0.60rem;
+  font-size: 0.58rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.22);
-  margin-bottom: 2px;
+  color: rgba(255, 255, 255, 0.20);
+  margin-bottom: 3px;
+  animation: g-fade-up 380ms var(--g-ease) 140ms both;
 }
 
 .guia-query-item {
@@ -200,42 +200,50 @@ body:has(form.flex) form h1::before { display: none !important; }
   gap: 8px;
   padding: 9px 12px;
   background: rgba(46, 163, 242, 0.05);
-  border: 1px solid rgba(46, 163, 242, 0.13);
+  border: 1px solid rgba(46, 163, 242, 0.12);
   border-radius: 8px;
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.77rem;
+  color: rgba(255, 255, 255, 0.50);
   line-height: 1.4;
-  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+  opacity: 0;
+  animation: g-fade-up 380ms var(--g-ease) both;
+  animation-fill-mode: both;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
   cursor: default;
 }
 
+/* Stagger Emil-style: cada query entra 55ms después de la anterior */
+.guia-query-item:nth-child(2) { animation-delay: 170ms; }
+.guia-query-item:nth-child(3) { animation-delay: 225ms; }
+.guia-query-item:nth-child(4) { animation-delay: 280ms; }
+
 .guia-query-item::before {
   content: '›';
-  color: rgba(46, 163, 242, 0.45);
-  font-size: 0.85rem;
-  line-height: 1.4;
+  color: rgba(46, 163, 242, 0.40);
+  font-size: 0.88rem;
+  line-height: 1.35;
   flex-shrink: 0;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .guia-query-item:hover {
     background: rgba(46, 163, 242, 0.10);
-    border-color: rgba(46, 163, 242, 0.28);
-    color: rgba(255, 255, 255, 0.78);
+    border-color: rgba(46, 163, 242, 0.26);
+    color: rgba(255, 255, 255, 0.75);
   }
 }
 
 /* ── Separador antes del botón ───────────────────────────────── */
 body:has(form.flex) form > div:last-child {
   border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
-  padding-top: 20px !important;
+  padding-top: 18px !important;
   margin-top: 0 !important;
-  animation: g-fade-up 700ms var(--g-ease) 220ms both !important;
+  animation: g-fade-up 380ms var(--g-ease) 330ms both !important;
 }
 
 @keyframes g-fade-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -281,9 +289,9 @@ body:has(form.flex) form button[type="button"]::before {
 @media (hover: hover) and (pointer: fine) {
   body:has(form.flex) form button[type="button"]:hover {
     background: rgba(46, 163, 242, 0.20) !important;
-    border-color: rgba(46, 163, 242, 0.60) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 28px -8px rgba(46,163,242,0.35) !important;
+    border-color: rgba(46, 163, 242, 0.58) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 24px -6px rgba(46,163,242,0.38) !important;
   }
   body:has(form.flex) form button[type="button"]:hover::before {
     left: 110% !important;
