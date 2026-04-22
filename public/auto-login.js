@@ -94,7 +94,7 @@
     // Wordmark GUIA uniforme
     var wm = document.createElement('div');
     wm.className = 'guia-hero-wordmark';
-    wm.textContent = 'GUIA';
+    wm.innerHTML = '<span class="guia-wm-text">GUIA</span>';
     form.insertBefore(wm, form.firstChild);
 
     // Acrónimo bajo el wordmark GUIA
