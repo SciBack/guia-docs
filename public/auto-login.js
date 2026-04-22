@@ -163,7 +163,10 @@
     for (var s = 0; s < 3; s++) {
       var item = document.createElement('div');
       item.className = 'guia-qoverlay-item';
-      item.textContent = QUERIES[s];
+      var span = document.createElement('span');
+      span.className = 'guia-qoverlay-text';
+      span.textContent = QUERIES[s];
+      item.appendChild(span);
       qlist.appendChild(item);
     }
     qbox.appendChild(qlist);
@@ -178,23 +181,23 @@
     var VISIBLE_MS = 3000;
 
     function rotateGroup() {
-      var items = qlist.querySelectorAll('.guia-qoverlay-item');
+      var spans = qlist.querySelectorAll('.guia-qoverlay-text');
 
-      // 1. Fade out
-      items.forEach(function (el) { el.classList.add('q-hidden'); });
+      // 1. Fade out solo el texto (el fondo del card permanece)
+      spans.forEach(function (sp) { sp.classList.add('q-hidden'); });
 
       setTimeout(function () {
-        // 2. Cambiar texto mientras están invisibles
+        // 2. Cambiar texto mientras está invisible
         var base = (groupIdx % GROUPS) * 3;
-        items.forEach(function (el, i) {
+        spans.forEach(function (sp, i) {
           var qi = base + i;
-          el.textContent = qi < QUERIES.length ? QUERIES[qi] : '';
+          sp.textContent = qi < QUERIES.length ? QUERIES[qi] : '';
         });
         groupIdx++;
 
         // 3. Fade in con stagger suave
-        items.forEach(function (el, i) {
-          setTimeout(function () { el.classList.remove('q-hidden'); }, i * 80);
+        spans.forEach(function (sp, i) {
+          setTimeout(function () { sp.classList.remove('q-hidden'); }, i * 80);
         });
       }, FADE_MS);
     }

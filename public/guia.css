@@ -306,7 +306,7 @@ body:has(form.flex) div.bg-muted.overflow-hidden > img {
   bottom: 12% !important;
   left: 0 !important;
   right: 0 !important;
-  padding: 0 36px !important;
+  padding: 0 52px !important;
   z-index: 10 !important;
   pointer-events: none !important;
   /* Degradado desde abajo para que las queries sean legibles sobre el video */
@@ -347,12 +347,17 @@ body:has(form.flex) div.bg-muted.overflow-hidden > img {
   -webkit-backdrop-filter: blur(12px);
   /* Estado base — visible */
   opacity: 1;
+}
+
+/* El texto va en un span — el fondo del card nunca desaparece */
+.guia-qoverlay-text {
+  display: block;
+  opacity: 1;
   transition: opacity 500ms var(--g-ease);
 }
 
-/* Fade out — JS añade .q-hidden */
-.guia-qoverlay-item.q-hidden {
-  opacity: 0 !important;
+.guia-qoverlay-text.q-hidden {
+  opacity: 0;
 }
 
 /* Entrada escalonada inicial */
