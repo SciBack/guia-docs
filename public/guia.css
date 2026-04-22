@@ -151,7 +151,7 @@ body:has(form.flex) form.flex::after {
 }
 
 .guia-wm-text {
-  background: linear-gradient(150deg, #ffffff 0%, #e8f6ff 28%, #a8dcff 65%, var(--g-blue) 100%);
+  background: linear-gradient(to bottom, #ffffff 0%, #c8e8ff 45%, var(--g-blue) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
