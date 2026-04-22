@@ -1,11 +1,12 @@
-// GUIA UPeU — scripts de inyección externa
-// 1. Colorea "IA" de GUIA en gold en el header del chat
-// 2. Inyecta knowledge graph animado en Canvas en el panel derecho del login
+// GUIA UPeU — inyección externa
+// 1. Wordmark "IA" gold en header del chat
+// 2. Hero content en login (acrónimo, queries de ejemplo, icono usuario)
+// 3. Knowledge graph animado en panel derecho
 
 (function () {
   'use strict';
 
-  // ── 1. Wordmark: "IA" en gold ──────────────────────────────────
+  // ── 1. Wordmark "IA" gold en chat ─────────────────────────────
   var STYLED = 'data-guia-styled';
 
   function styleGuiaNode(node) {
@@ -36,46 +37,98 @@
     });
   });
 
-  // ── 2. Knowledge graph en Canvas ──────────────────────────────
+  // ── 2. Hero content en login ──────────────────────────────────
   function isLoginPage() {
     return /^\/(login)?$/.test(window.location.pathname);
   }
 
-  // Nodos del grafo (posiciones relativas 0-1 al canvas)
-  var NODE_DEFS = [
-    // Hub central — representa GUIA
-    { rx: 0.50, ry: 0.47, r: 7.5, op: 0.85, hub: true,  po: 0 },
-    // Nodos de primer nivel (papers, autores)
-    { rx: 0.30, ry: 0.24, r: 4.5, op: 0.60, hub: false, po: 1.1 },
-    { rx: 0.62, ry: 0.20, r: 3.5, op: 0.50, hub: false, po: 2.3 },
-    { rx: 0.76, ry: 0.38, r: 5.0, op: 0.65, hub: false, po: 0.7 },
-    { rx: 0.72, ry: 0.63, r: 3.0, op: 0.45, hub: false, po: 3.1 },
-    { rx: 0.54, ry: 0.74, r: 4.0, op: 0.55, hub: false, po: 1.8 },
-    { rx: 0.33, ry: 0.71, r: 3.5, op: 0.50, hub: false, po: 2.7 },
-    { rx: 0.20, ry: 0.55, r: 4.5, op: 0.58, hub: false, po: 0.4 },
-    { rx: 0.22, ry: 0.34, r: 3.0, op: 0.45, hub: false, po: 3.8 },
-    // Nodos de segundo nivel (más periféricos)
-    { rx: 0.42, ry: 0.14, r: 2.0, op: 0.35, hub: false, po: 1.5 },
-    { rx: 0.82, ry: 0.24, r: 2.5, op: 0.35, hub: false, po: 2.1 },
-    { rx: 0.85, ry: 0.58, r: 2.0, op: 0.30, hub: false, po: 0.9 },
-    { rx: 0.14, ry: 0.18, r: 2.0, op: 0.28, hub: false, po: 4.2 },
-    { rx: 0.12, ry: 0.72, r: 2.5, op: 0.32, hub: false, po: 3.4 },
-    { rx: 0.60, ry: 0.88, r: 2.0, op: 0.28, hub: false, po: 1.9 },
+  var QUERIES = [
+    '¿Qué tesis de inteligencia artificial hay en UPeU?',
+    'Analiza los artículos de medicina publicados este año',
+    '¿Qué revistas UPeU están indexadas en Scopus?'
   ];
 
-  // Conexiones: [from, to, base_opacity]
+  var USER_ICON = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" ' +
+    'style="flex-shrink:0;opacity:0.75">' +
+    '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>' +
+    '<circle cx="12" cy="7" r="4"/></svg>';
+
+  function injectHeroContent() {
+    if (document.querySelector('.guia-acronym')) return true;
+
+    var form = document.querySelector('form.flex');
+    if (!form) return false;
+
+    var titleDiv = form.querySelector('div.flex.flex-col.items-center');
+    if (!titleDiv) return false;
+
+    // Acrónimo bajo el h1
+    var acronym = document.createElement('p');
+    acronym.className = 'guia-acronym';
+    acronym.textContent = 'Gateway Universitario · Información y Asistencia';
+    titleDiv.appendChild(acronym);
+
+    // Cambiar alineación del div de título a izquierda
+    titleDiv.style.alignItems = 'flex-start';
+    titleDiv.style.textAlign = 'left';
+
+    // Queries de ejemplo
+    var section = document.createElement('div');
+    section.className = 'guia-queries';
+
+    var label = document.createElement('div');
+    label.className = 'guia-queries-label';
+    label.textContent = 'Pregúntale a GUIA';
+    section.appendChild(label);
+
+    QUERIES.forEach(function (q) {
+      var item = document.createElement('div');
+      item.className = 'guia-query-item';
+      item.textContent = q;
+      section.appendChild(item);
+    });
+
+    var grid = form.querySelector('div.grid');
+    if (grid) form.insertBefore(section, grid);
+
+    // Icono usuario en el botón OAuth
+    var btn = form.querySelector('button[type="button"]');
+    if (btn) btn.insertAdjacentHTML('afterbegin', USER_ICON);
+
+    return true;
+  }
+
+  // ── 3. Knowledge graph canvas ─────────────────────────────────
+  var NODE_DEFS = [
+    // hub central — GUIA
+    { rx: 0.50, ry: 0.46, r: 8.0, op: 0.90, hub: true,  po: 0,   dr: 0     },
+    // primer nivel
+    { rx: 0.30, ry: 0.23, r: 5.0, op: 0.65, hub: false, po: 1.1, dr: 0.012 },
+    { rx: 0.63, ry: 0.19, r: 4.0, op: 0.55, hub: false, po: 2.3, dr: 0.010 },
+    { rx: 0.77, ry: 0.37, r: 5.5, op: 0.68, hub: false, po: 0.7, dr: 0.011 },
+    { rx: 0.73, ry: 0.64, r: 3.5, op: 0.50, hub: false, po: 3.1, dr: 0.013 },
+    { rx: 0.55, ry: 0.75, r: 4.5, op: 0.58, hub: false, po: 1.8, dr: 0.010 },
+    { rx: 0.32, ry: 0.72, r: 4.0, op: 0.55, hub: false, po: 2.7, dr: 0.012 },
+    { rx: 0.19, ry: 0.54, r: 5.0, op: 0.62, hub: false, po: 0.4, dr: 0.009 },
+    { rx: 0.21, ry: 0.33, r: 3.5, op: 0.50, hub: false, po: 3.8, dr: 0.011 },
+    // segundo nivel
+    { rx: 0.43, ry: 0.13, r: 2.5, op: 0.38, hub: false, po: 1.5, dr: 0.016 },
+    { rx: 0.83, ry: 0.23, r: 3.0, op: 0.38, hub: false, po: 2.1, dr: 0.014 },
+    { rx: 0.87, ry: 0.59, r: 2.5, op: 0.33, hub: false, po: 0.9, dr: 0.015 },
+    { rx: 0.13, ry: 0.17, r: 2.5, op: 0.30, hub: false, po: 4.2, dr: 0.013 },
+    { rx: 0.11, ry: 0.73, r: 3.0, op: 0.35, hub: false, po: 3.4, dr: 0.012 },
+    { rx: 0.61, ry: 0.89, r: 2.5, op: 0.30, hub: false, po: 1.9, dr: 0.014 },
+  ];
+
   var CONNECTIONS = [
-    // Hub → todos los de primer nivel
-    [0,1,0.18],[0,2,0.15],[0,3,0.20],[0,4,0.14],[0,5,0.17],
-    [0,6,0.15],[0,7,0.18],[0,8,0.14],
-    // Anillo exterior
-    [1,2,0.10],[2,3,0.11],[3,4,0.10],[4,5,0.09],
-    [5,6,0.10],[6,7,0.09],[7,8,0.10],[8,1,0.09],
-    // Nodos periféricos
-    [1,9,0.08],[2,10,0.08],[3,11,0.07],
-    [1,12,0.07],[7,13,0.07],[5,14,0.07],
-    // Conexiones cruzadas
-    [2,5,0.08],[1,6,0.07],[3,7,0.08],[4,8,0.07],
+    [0,1,0.22],[0,2,0.18],[0,3,0.24],[0,4,0.17],[0,5,0.20],
+    [0,6,0.18],[0,7,0.22],[0,8,0.17],
+    [1,2,0.12],[2,3,0.13],[3,4,0.12],[4,5,0.11],
+    [5,6,0.12],[6,7,0.11],[7,8,0.12],[8,1,0.11],
+    [1,9,0.09],[2,10,0.09],[3,11,0.08],
+    [1,12,0.08],[7,13,0.08],[5,14,0.08],
+    [2,5,0.09],[1,6,0.08],[3,7,0.09],[4,8,0.08],
   ];
 
   function injectKnowledgeGraph() {
@@ -90,87 +143,138 @@
     var ctx = canvas.getContext('2d');
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Fade-in de conexiones escalonado
+    // Estado de fade-in de cada conexión
     var connState = CONNECTIONS.map(function (c, i) {
-      return { cur: 0, max: c[2], delay: i * 0.12 };
+      return { cur: 0, max: c[2], delay: i * 0.09 };
     });
 
     var t0 = Date.now();
-    var raf;
 
     function draw() {
       var W = panel.offsetWidth;
       var H = panel.offsetHeight;
-      if (!W || !H) { raf = requestAnimationFrame(draw); return; }
+      if (!W || !H) { requestAnimationFrame(draw); return; }
       canvas.width = W;
       canvas.height = H;
 
       var t = (Date.now() - t0) / 1000;
 
       // ── Fondo ────────────────────────────────────────────────
-      var bg = ctx.createLinearGradient(0, 0, W * 0.6, H);
-      bg.addColorStop(0, '#001929');
-      bg.addColorStop(1, '#023052');
+      var bg = ctx.createLinearGradient(0, 0, W * 0.5, H);
+      bg.addColorStop(0, '#001626');
+      bg.addColorStop(1, '#012d4e');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, W, H);
 
-      var g1 = ctx.createRadialGradient(W*0.35,H*0.28,0, W*0.35,H*0.28, W*0.55);
-      g1.addColorStop(0, 'rgba(46,163,242,0.12)'); g1.addColorStop(1,'transparent');
-      ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+      // Glows de ambiente
+      var g1 = ctx.createRadialGradient(W*0.32, H*0.25, 0, W*0.32, H*0.25, W*0.52);
+      g1.addColorStop(0, 'rgba(46,163,242,0.11)'); g1.addColorStop(1, 'transparent');
+      ctx.fillStyle = g1; ctx.fillRect(0, 0, W, H);
 
-      var g2 = ctx.createRadialGradient(W*0.72,H*0.78,0, W*0.72,H*0.78, W*0.4);
-      g2.addColorStop(0,'rgba(248,169,0,0.05)'); g2.addColorStop(1,'transparent');
-      ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+      var g2 = ctx.createRadialGradient(W*0.70, H*0.80, 0, W*0.70, H*0.80, W*0.38);
+      g2.addColorStop(0, 'rgba(248,169,0,0.06)'); g2.addColorStop(1, 'transparent');
+      ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H);
 
-      // ── Posiciones actuales de nodos ─────────────────────────
-      var nodes = NODE_DEFS.map(function (n, i) {
-        var pulse = reduced ? 0 : Math.sin(t * 1.1 + n.po) * 0.22;
+      // ── Posiciones de nodos con drift orgánico ────────────────
+      var nodes = NODE_DEFS.map(function (n) {
+        var pulse = reduced ? 0 : Math.sin(t * 1.1 + n.po) * 0.20;
+        var dx = reduced ? 0 : Math.sin(t * 0.19 + n.po * 1.73) * n.dr * W;
+        var dy = reduced ? 0 : Math.cos(t * 0.16 + n.po * 1.41) * n.dr * H;
         return {
-          x: n.rx * W, y: n.ry * H,
-          r: n.r + (n.hub ? Math.abs(pulse) * 2.5 : Math.abs(pulse)),
-          op: Math.max(0.15, Math.min(1, n.op + pulse * 0.35)),
+          x: n.rx * W + (n.hub ? 0 : dx),
+          y: n.ry * H + (n.hub ? 0 : dy),
+          r: n.r + (n.hub ? Math.abs(pulse) * 2.8 : Math.abs(pulse) * 0.9),
+          op: Math.max(0.18, Math.min(1, n.op + pulse * 0.30)),
           hub: n.hub
         };
       });
 
-      // ── Conexiones ───────────────────────────────────────────
+      var hub = nodes[0];
+
+      // ── Pulsos radiales desde el hub (3 anillos en fases) ─────
+      if (!reduced) {
+        for (var p = 0; p < 3; p++) {
+          var pt = ((t * 0.20 + p / 3) % 1);
+          var pr = pt * 130;
+          var po = Math.pow(1 - pt, 1.5) * 0.18;
+          ctx.beginPath();
+          ctx.arc(hub.x, hub.y, pr, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(46,163,242,' + po + ')';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
+      }
+
+      // ── Conexiones con fade-in escalonado ─────────────────────
       CONNECTIONS.forEach(function (c, i) {
         var a = nodes[c[0]], b = nodes[c[1]];
         var cs = connState[i];
         var elapsed = t - cs.delay;
         if (elapsed < 0) return;
-        // Fade in suave
-        cs.cur = Math.min(cs.max, cs.cur + 0.006);
+        cs.cur = Math.min(cs.max, cs.cur + 0.005);
         var op = cs.cur;
-        if (!reduced) op *= (0.65 + 0.35 * Math.sin(t * 0.35 + i * 0.7));
+        if (!reduced) op *= (0.60 + 0.40 * Math.sin(t * 0.32 + i * 0.68));
 
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
         ctx.lineTo(b.x, b.y);
         ctx.strokeStyle = 'rgba(46,163,242,' + op + ')';
-        ctx.lineWidth = 0.75;
+        ctx.lineWidth = 0.8;
         ctx.stroke();
       });
 
-      // ── Nodos ────────────────────────────────────────────────
+      // ── Partículas de datos viajando por conexiones ───────────
+      if (!reduced) {
+        CONNECTIONS.forEach(function (c, i) {
+          var cs = connState[i];
+          if (cs.cur < cs.max * 0.4) return;
+          var a = nodes[c[0]], b = nodes[c[1]];
+          var speed = 0.28 + (i % 7) * 0.04;
+          var phase = (t * speed + i * 0.43) % 1;
+          var px = a.x + (b.x - a.x) * phase;
+          var py = a.y + (b.y - a.y) * phase;
+          var particleOp = 0.5 + 0.5 * Math.sin(t * 1.5 + i);
+          var gp = ctx.createRadialGradient(px, py, 0, px, py, 3.5);
+          gp.addColorStop(0, 'rgba(46,163,242,' + particleOp + ')');
+          gp.addColorStop(1, 'transparent');
+          ctx.fillStyle = gp;
+          ctx.beginPath();
+          ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      // ── Nodos ─────────────────────────────────────────────────
       nodes.forEach(function (n) {
         // Glow exterior
-        var gr = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 5);
-        gr.addColorStop(0, 'rgba(46,163,242,' + (n.op * 0.22) + ')');
+        var glowR = n.hub ? n.r * 6 : n.r * 5;
+        var gr = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowR);
+        gr.addColorStop(0, 'rgba(46,163,242,' + (n.op * (n.hub ? 0.28 : 0.18)) + ')');
         gr.addColorStop(1, 'transparent');
         ctx.fillStyle = gr;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r * 5, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, glowR, 0, Math.PI * 2);
         ctx.fill();
 
         // Punto central
-        ctx.fillStyle = 'rgba(46,163,242,' + Math.min(1, n.op) + ')';
+        ctx.fillStyle = n.hub
+          ? 'rgba(46,163,242,' + Math.min(1, n.op) + ')'
+          : 'rgba(46,163,242,' + Math.min(0.95, n.op) + ')';
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
         ctx.fill();
+
+        // Ring extra en hub
+        if (n.hub) {
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r + 4, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(46,163,242,0.30)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
       });
 
-      raf = requestAnimationFrame(draw);
+      requestAnimationFrame(draw);
     }
 
     draw();
@@ -183,9 +287,18 @@
     guiaObs.observe(document.body, { childList: true, subtree: true });
 
     if (isLoginPage()) {
-      if (!injectKnowledgeGraph()) {
+      var heroDone = false;
+      var graphDone = false;
+
+      function tryInject() {
+        if (!heroDone) heroDone = injectHeroContent();
+        if (!graphDone) graphDone = injectKnowledgeGraph();
+        return heroDone && graphDone;
+      }
+
+      if (!tryInject()) {
         var obs = new MutationObserver(function () {
-          if (injectKnowledgeGraph()) obs.disconnect();
+          if (tryInject()) obs.disconnect();
         });
         obs.observe(document.body, { childList: true, subtree: true });
         setTimeout(function () { obs.disconnect(); }, 15000);

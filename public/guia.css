@@ -6,9 +6,6 @@
   --g-blue:    #2ea3f2;
   --g-gold:    #f8a900;
   --g-ease:    cubic-bezier(0.23, 1, 0.32, 1);
-  --g-ease-in: cubic-bezier(0.55, 0, 1, 0.45);
-  --upeu-gold: #f8a900;
-  --upeu-blue: #2ea3f2;
   --upeu-glow: rgba(46, 163, 242, 0.14);
 }
 
@@ -94,31 +91,33 @@ textarea:focus, input[type="text"]:focus {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   LOGIN — panel izquierdo (la superficie, sin card separado)
+   LOGIN — panel izquierdo HERO
    DOM: div.grid.min-h-svh > div:first-child + div:last-child
    ══════════════════════════════════════════════════════════════ */
 
 body:has(form.flex) div.grid > div:first-child {
   position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
   background:
-    radial-gradient(ellipse 80% 50% at 30% 0%,   rgba(46,163,242,0.07), transparent 60%),
-    radial-gradient(ellipse 50% 35% at 85% 100%, rgba(248,169,0,0.04),  transparent 55%),
+    radial-gradient(ellipse 90% 55% at 20% 5%,  rgba(46,163,242,0.08), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 95%, rgba(248,169,0,0.04),  transparent 55%),
     hsl(var(--background)) !important;
 }
 
 /* Logo UPeU */
 body:has(form.flex) img[class*="logo"],
 body:has(form.flex) img.logo {
-  width: 160px !important;
+  width: 140px !important;
   height: auto !important;
 }
 
-/* Ampliar contenedor */
+/* Ampliar contenedor del form */
 body:has(form.flex) div.grid > div:first-child .max-w-xs {
-  max-width: 380px !important;
+  max-width: 400px !important;
 }
 
-/* ── Form sin card — la columna es la superficie ────────────── */
+/* ── Form sin card ─────────────────────────────────────────── */
 body:has(form.flex) form.flex {
   background: transparent !important;
   border: none !important;
@@ -126,120 +125,168 @@ body:has(form.flex) form.flex {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   border-radius: 0 !important;
-  padding: 8px 0 24px !important;
+  padding: 0 0 8px !important;
+  gap: 20px !important;
 }
 
-/* Quitar el accent bar (sin card, no aplica) */
-body:has(form.flex) form.flex::before {
-  display: none !important;
-}
+body:has(form.flex) form.flex::before { display: none !important; }
 
-/* Wordmark GUIA — primer elemento del form (order: -1) */
+/* ── Hero wordmark GUIA ──────────────────────────────────────── */
 body:has(form.flex) form.flex::after {
   content: 'GUIA' !important;
   order: -1 !important;
   display: block !important;
   flex-shrink: 0 !important;
-  text-align: center !important;
-  font-size: 3.5rem !important;
+  text-align: left !important;
+  font-size: 5.5rem !important;
   font-weight: 900 !important;
   letter-spacing: -0.06em !important;
-  line-height: 1 !important;
-  margin-bottom: 6px !important;
-  background: linear-gradient(155deg, #9dd8fc 0%, var(--g-blue) 45%, #1a7fcf 100%) !important;
+  line-height: 0.92 !important;
+  margin-bottom: 0 !important;
+  background: linear-gradient(145deg, #c5e8fd 0%, var(--g-blue) 40%, #1a7fcf 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
-  animation: g-fade-up 600ms var(--g-ease) both !important;
+  animation: g-fade-up 700ms var(--g-ease) both !important;
 }
 
-/* Texto institucional encima del h1 */
+/* ── h1 — tagline secundario ─────────────────────────────────── */
 body:has(form.flex) form h1 {
-  position: relative !important;
-  padding-top: 20px !important;
-  font-size: 0.92rem !important;
+  font-size: 0.85rem !important;
   font-weight: 400 !important;
-  color: rgba(255, 255, 255, 0.60) !important;
-  text-align: center !important;
+  color: rgba(255, 255, 255, 0.42) !important;
+  text-align: left !important;
   letter-spacing: 0.01em !important;
   line-height: 1.5 !important;
-  animation: g-fade-up 600ms var(--g-ease) 100ms both !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  animation: g-fade-up 700ms var(--g-ease) 120ms both !important;
 }
 
-body:has(form.flex) form h1::before {
-  content: 'UNIVERSIDAD PERUANA UNIÓN' !important;
-  position: absolute !important;
-  top: 0 !important; left: 0 !important; right: 0 !important;
-  text-align: center !important;
-  font-size: 0.52rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.20em !important;
-  text-transform: uppercase !important;
-  color: rgba(46, 163, 242, 0.45) !important;
-  -webkit-text-fill-color: rgba(46, 163, 242, 0.45) !important;
-  padding-bottom: 10px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+body:has(form.flex) form h1::before { display: none !important; }
+
+/* ── Acrónimo (inyectado por JS) ─────────────────────────────── */
+.guia-acronym {
+  font-size: 0.60rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(46, 163, 242, 0.55);
+  text-align: left;
+  margin-top: 6px;
+  animation: g-fade-up 700ms var(--g-ease) 60ms both;
 }
 
-/* Línea divisoria antes del botón */
+/* ── Ejemplos de consultas (inyectados por JS) ──────────────── */
+.guia-queries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: g-fade-up 700ms var(--g-ease) 160ms both;
+}
+
+.guia-queries-label {
+  font-size: 0.60rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+  margin-bottom: 2px;
+}
+
+.guia-query-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 12px;
+  background: rgba(46, 163, 242, 0.05);
+  border: 1px solid rgba(46, 163, 242, 0.13);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.4;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+  cursor: default;
+}
+
+.guia-query-item::before {
+  content: '›';
+  color: rgba(46, 163, 242, 0.45);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .guia-query-item:hover {
+    background: rgba(46, 163, 242, 0.10);
+    border-color: rgba(46, 163, 242, 0.28);
+    color: rgba(255, 255, 255, 0.78);
+  }
+}
+
+/* ── Separador antes del botón ───────────────────────────────── */
 body:has(form.flex) form > div:last-child {
   border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
   padding-top: 20px !important;
-  margin-top: 4px !important;
-  animation: g-fade-up 600ms var(--g-ease) 180ms both !important;
+  margin-top: 0 !important;
+  animation: g-fade-up 700ms var(--g-ease) 220ms both !important;
 }
 
 @keyframes g-fade-up {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   BOTÓN OAUTH
+   BOTÓN OAUTH — hero style
    ══════════════════════════════════════════════════════════════ */
 
 body:has(form.flex) form button[type="button"] {
   position: relative !important;
   overflow: hidden !important;
-  background: rgba(46, 163, 242, 0.12) !important;
-  border: 1px solid rgba(46, 163, 242, 0.28) !important;
-  border-left-width: 2px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  background: rgba(46, 163, 242, 0.13) !important;
+  border: 1px solid rgba(46, 163, 242, 0.32) !important;
   border-radius: 10px !important;
-  color: rgba(255, 255, 255, 0.90) !important;
-  font-size: 0.88rem !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.02em !important;
-  padding: 13px 20px !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  padding: 16px 24px !important;
+  height: auto !important;
   width: 100% !important;
   cursor: pointer !important;
   transition:
     transform 160ms var(--g-ease),
-    box-shadow 200ms ease,
-    border-color 200ms ease,
-    background 200ms ease !important;
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background 220ms ease !important;
 }
 
 /* Shimmer en hover */
 body:has(form.flex) form button[type="button"]::before {
   content: '' !important;
   position: absolute !important;
-  top: 0 !important; left: -100% !important;
+  top: 0 !important; left: -110% !important;
   width: 100% !important; height: 100% !important;
-  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.08) 50%, transparent 80%) !important;
-  transition: left 400ms var(--g-ease) !important;
+  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.09) 50%, transparent 80%) !important;
+  transition: left 450ms var(--g-ease) !important;
   pointer-events: none !important;
 }
 
 @media (hover: hover) and (pointer: fine) {
   body:has(form.flex) form button[type="button"]:hover {
-    background: rgba(46, 163, 242, 0.18) !important;
-    border-color: rgba(46, 163, 242, 0.55) !important;
-    border-left-color: var(--g-blue) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 20px -6px rgba(46,163,242,0.30) !important;
+    background: rgba(46, 163, 242, 0.20) !important;
+    border-color: rgba(46, 163, 242, 0.60) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 28px -8px rgba(46,163,242,0.35) !important;
   }
   body:has(form.flex) form button[type="button"]:hover::before {
-    left: 100% !important;
+    left: 110% !important;
   }
 }
 
@@ -255,7 +302,7 @@ body:has(form.flex) form button[type="button"]:focus-visible {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   PANEL DERECHO — knowledge graph en Canvas
+   PANEL DERECHO — knowledge graph canvas
    JS inyecta <canvas class="guia-canvas">; <img> oculto.
    ══════════════════════════════════════════════════════════════ */
 
