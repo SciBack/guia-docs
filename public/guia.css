@@ -137,7 +137,7 @@ body:has(form.flex) form.flex::after {
   order: -1 !important;
   display: block !important;
   flex-shrink: 0 !important;
-  text-align: left !important;
+  text-align: center !important;
   font-size: clamp(6.5rem, 14vw, 9.5rem) !important;
   font-weight: 900 !important;
   letter-spacing: -0.07em !important;
@@ -166,8 +166,9 @@ body:has(form.flex) form h1::before { display: none !important; }
   text-transform: uppercase;
   color: var(--g-gold);
   opacity: 0.72;
-  text-align: left;
+  text-align: center !important;
   margin-top: 8px;
+  margin-bottom: 28px;
   animation: g-fade-up 380ms var(--g-ease) 60ms both;
 }
 

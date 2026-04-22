@@ -70,8 +70,8 @@
     titleDiv.appendChild(acronym);
 
     // Cambiar alineación del div de título a izquierda
-    titleDiv.style.alignItems = 'flex-start';
-    titleDiv.style.textAlign = 'left';
+    titleDiv.style.alignItems = 'center';
+    titleDiv.style.textAlign = 'center';
 
     // Queries de ejemplo
     var section = document.createElement('div');
