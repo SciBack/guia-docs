@@ -1,91 +1,286 @@
 /* ═══════════════════════════════════════════════════════════
-   GUIA · UPeU — Custom Login Theme
-   Solo activo en /login via body:has(form.flex)
-   No modifica ningún archivo core de Chainlit.
+   GUIA · UPeU — Inyección externa de tema
+   Chainlit 2.11.x · No modifica ningún archivo core.
    ═══════════════════════════════════════════════════════════ */
 
+/* ── 0. Variables ──────────────────────────────────────────── */
 :root {
+  --guia-ease:        cubic-bezier(0.23, 1, 0.32, 1);
+  --guia-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --upeu-blue:  #2ea3f2;
   --upeu-navy:  #023052;
   --upeu-gold:  #f8a900;
-  --upeu-ease:  cubic-bezier(0.23, 1, 0.32, 1);
+  --upeu-glow:  rgba(46, 163, 242, 0.14);
 }
 
-/* ── Logo UPeU ─────────────────────────────────────────────
-   Chainlit sirve el logo como <img class="logo">
-   Ajustamos tamaño para que el SVG de UPeU se vea bien.
+/* ══════════════════════════════════════════════════════════════
+   CHAT APP — micro-interacciones y polish
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Botones — responden al press (Emil: scale 0.97) ────── */
+button:not(:disabled) {
+  transition:
+    transform 140ms var(--guia-ease),
+    box-shadow 180ms ease,
+    opacity 140ms ease-out;
+}
+
+button:not(:disabled):active {
+  transform: scale(0.97) !important;
+  transition-duration: 70ms !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):hover {
+    opacity: 0.85;
+  }
+}
+
+/* ── 2. Input / textarea — focus con ring azul ─────────────── */
+textarea,
+input[type="text"] {
+  transition: box-shadow 160ms var(--guia-ease) !important;
+}
+
+textarea:focus,
+input[type="text"]:focus {
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.6) !important;
+  outline: none !important;
+}
+
+/* ── 3. Links en mensajes — fuentes académicas ─────────────── */
+.step a[href],
+[class*="message"] a[href],
+[class*="step"] a[href] {
+  color: hsl(var(--primary)) !important;
+  text-decoration: underline !important;
+  text-decoration-color: hsl(var(--primary) / 0.35) !important;
+  text-underline-offset: 3px !important;
+  transition:
+    text-decoration-color 140ms ease,
+    color 140ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .step a[href]:hover,
+  [class*="message"] a[href]:hover,
+  [class*="step"] a[href]:hover {
+    text-decoration-color: hsl(var(--primary)) !important;
+  }
+}
+
+/* ── 4. Badge caché semántico ─────────────────────────────────
+   La respuesta cached incluye "*Respuesta desde caché semántico*"
+   → renderizado como <em> al final del mensaje.
    ─────────────────────────────────────────────────────────── */
+.step p:last-child > em:only-child,
+.step p:last-child > em:last-child,
+[class*="message"] p:last-child > em:only-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  padding: 3px 10px;
+  background: rgba(248, 169, 0, 0.09);
+  border: 1px solid rgba(248, 169, 0, 0.28);
+  border-radius: 99px;
+  color: var(--upeu-gold) !important;
+  font-size: 0.71rem;
+  font-style: normal !important;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+.step p:last-child > em:only-child::before,
+.step p:last-child > em:last-child::before,
+[class*="message"] p:last-child > em:only-child::before {
+  content: "⚡";
+  font-size: 0.65rem;
+}
+
+/* ── 5. "Fuentes:" — sección de citas académicas ──────────── */
+.step strong,
+[class*="message"] strong {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Numeración de fuentes con acento gold */
+.step ol li::marker,
+[class*="message"] ol li::marker {
+  color: var(--upeu-gold);
+  font-weight: 600;
+}
+
+/* ── 6. Starters — tarjetas de pregunta inicial ───────────── */
+[class*="starter"],
+[class*="Starter"] {
+  transition:
+    transform 200ms var(--guia-ease),
+    border-color 150ms ease,
+    box-shadow 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [class*="starter"]:hover,
+  [class*="Starter"]:hover {
+    transform: translateY(-2px) !important;
+    border-color: hsl(var(--primary) / 0.45) !important;
+    box-shadow: 0 8px 24px -8px var(--upeu-glow) !important;
+  }
+}
+
+[class*="starter"]:active,
+[class*="Starter"]:active {
+  transform: scale(0.98) !important;
+  transition-duration: 80ms !important;
+}
+
+/* ── 7. Wordmark GUIA — "IA" en gold ──────────────────────── */
+.guia-wordmark {
+  display: inline;
+}
+
+.guia-ia {
+  color: var(--upeu-gold);
+  font-weight: 700;
+}
+
+/* ── 8. Entrada de mensajes nuevos ────────────────────────── */
+.step {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 240ms var(--guia-ease), transform 240ms var(--guia-ease);
+}
+
+@starting-style {
+  .step {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LOGIN PAGE  ·  Scoped con body:has(form.flex)
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Logo UPeU ─────────────────────────────────────────────── */
+body:has(form.flex) img[class*="logo"],
 body:has(form.flex) img.logo {
   width: 200px !important;
   height: auto !important;
   opacity: 1 !important;
+  filter: drop-shadow(0 2px 20px rgba(46, 163, 242, 0.18)) !important;
 }
 
-/* ── Columna izquierda — fondo con glow sutil ──────────────
-   Selector exacto: div.flex.flex-col.gap-4 (primer hijo del grid)
-   ─────────────────────────────────────────────────────────── */
+/* ── Columna izquierda — glow atmosférico ──────────────────── */
 body:has(form.flex) div.flex.flex-col.gap-4 {
   background:
-    radial-gradient(ellipse 70% 45% at 40% 0%,
-      rgba(46, 163, 242, 0.07), transparent 60%),
+    radial-gradient(
+      ellipse 65% 45% at 35% 0%,
+      rgba(46, 163, 242, 0.08) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 35% 25% at 85% 95%,
+      rgba(248, 169, 0, 0.04) 0%,
+      transparent 60%
+    ),
     hsl(var(--background)) !important;
 }
 
-/* ── Ampliar el contenedor del form más allá de max-w-xs ───
-   max-w-xs = 320px; ampliamos a 400px para más espacio.
-   ─────────────────────────────────────────────────────────── */
+/* ── Contenedor — ampliar ancho del form ──────────────────── */
 body:has(form.flex) div.w-full.max-w-xs {
-  max-width: 400px !important;
+  max-width: 420px !important;
 }
 
-/* ── Card del formulario ───────────────────────────────────
-   form.flex.flex-col.gap-6 es el selector exacto de Chainlit
-   ─────────────────────────────────────────────────────────── */
-body:has(form.flex) form.flex.flex-col.gap-6 {
-  background: rgba(255, 255, 255, 0.04) !important;
+/* ── Card glassmorphism ──────────────────────────────────── */
+body:has(form.flex) form.flex.flex-col.gap-6,
+body:has(form.flex) form.flex.flex-col.gap-4,
+body:has(form.flex) form.flex.flex-col {
+  background: rgba(2, 48, 82, 0.50) !important;
   border: 1px solid rgba(46, 163, 242, 0.18) !important;
   border-radius: 20px !important;
-  backdrop-filter: blur(18px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(130%) !important;
+  backdrop-filter: blur(20px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 24px 48px -16px rgba(0, 0, 0, 0.50) !important;
-  padding: 36px 32px 32px !important;
-  animation: upeu-rise 380ms var(--upeu-ease) both !important;
+    0 36px 72px -20px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+  padding: 40px 36px 36px !important;
+  animation: guia-rise 360ms var(--guia-ease) both !important;
 }
 
-@keyframes upeu-rise {
-  from { opacity: 0; transform: translateY(10px) scale(0.98); }
-  to   { opacity: 1; transform: none; }
+/* ── Título del login ─────────────────────────────────────── */
+body:has(form.flex) h1,
+body:has(form.flex) [class*="title"],
+body:has(form.flex) form p:first-child {
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
 }
 
-/* ── Botón OAuth ───────────────────────────────────────────
-   Scoped dentro del form para no afectar otros botones.
-   ─────────────────────────────────────────────────────────── */
+/* ── Botón OAuth "Continuar con UPeU" ────────────────────── */
 body:has(form.flex) form button[type="button"] {
-  background: linear-gradient(135deg, #023052 0%, #1557a0 100%) !important;
-  border: 1px solid rgba(46, 163, 242, 0.28) !important;
+  background: linear-gradient(135deg, #023052 0%, #1063a8 100%) !important;
+  border: 1px solid rgba(46, 163, 242, 0.30) !important;
   border-radius: 10px !important;
   color: #ffffff !important;
   font-size: 0.9rem !important;
   font-weight: 500 !important;
-  padding: 13px 20px !important;
+  letter-spacing: 0.01em;
+  padding: 14px 20px !important;
   width: 100% !important;
   cursor: pointer !important;
   transition:
-    transform 160ms var(--upeu-ease),
-    box-shadow 220ms ease,
-    border-color 200ms ease !important;
+    transform 160ms var(--guia-ease),
+    box-shadow 200ms ease,
+    border-color 180ms ease !important;
 }
 
-body:has(form.flex) form button[type="button"]:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 10px 28px -8px rgba(46, 163, 242, 0.40) !important;
-  border-color: rgba(46, 163, 242, 0.50) !important;
+@media (hover: hover) and (pointer: fine) {
+  body:has(form.flex) form button[type="button"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 14px 36px -10px rgba(46, 163, 242, 0.38) !important;
+    border-color: rgba(46, 163, 242, 0.55) !important;
+  }
 }
 
 body:has(form.flex) form button[type="button"]:active {
   transform: scale(0.97) !important;
-  transition-duration: 80ms !important;
+  transition-duration: 70ms !important;
   box-shadow: none !important;
+}
+
+/* ── Watermark / footer del login ─────────────────────────── */
+body:has(form.flex) [class*="watermark"],
+body:has(form.flex) footer {
+  opacity: 0.45 !important;
+  font-size: 0.72rem !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ANIMACIONES
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes guia-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* ── Reduced motion — sin movimiento, solo fade ───────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
